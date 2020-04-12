@@ -1,22 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Logged in! -->
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Dashboard</div>
-
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    You are logged in!
+        <div class="col-md-12">
+        	@if (session('status'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
                 </div>
-            </div>
+            @endif
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+        	<home
+        		:is-responder="{{ auth()->user()->status == \App\User::STATUS_RESPONDER ? 'true' : 'false' }}"
+        		:delivery-options="{{json_encode(\App\Sos::getDeliveryOptionsArray())}}"
+                :payment-options="{{json_encode(\App\Sos::getPaymentOptionsArray())}}"
+        		user-name="{{ auth()->user()->getUserName() }}"
+        	></home>
+        
+    		
+            <!-- <div class="card">
+                <div class="card-header">Dashboard</div>
+                <div class="card-body">
+            
+                </div>
+            </div> -->
         </div>
     </div>
 </div>

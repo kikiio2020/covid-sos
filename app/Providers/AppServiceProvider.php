@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Request;
+use App\Observers\RequestObserver;
+use App\Sos;
+use App\Observers\SosObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +27,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Sos::observe(SosObserver::class);
     }
 }
