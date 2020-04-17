@@ -27,11 +27,15 @@
         <!--:items="dataProvider"-->
         <b-table
             id="grid-table"
+            ref="gridTable"
             :items="items"
             :fields="gridFields"
             :filter="filter"
             :per-page="rowPerPage"
             :current-page="currentPage"
+            v-bind="tableProperties"
+            v-b-popover="tableProperties.vBPopover"
+            @row-selected="onRowSelected"
         >
             <template v-slot:cell(actions)="row">
                 <b-icon-pen v-if="editable" class="button" @click="editModel(row.item, $event.target)"></b-icon-pen>
@@ -45,7 +49,6 @@
             aria-controls="grid-table"
             align="right"
         ></b-pagination>
-
         <!-- Edit modal -->
         <b-modal :id="id" :size='modalSize' :title="editModalTitle" ok-title="Save" @hide="resetEditModal();loadData();" no-close-on-backdrop>
             <ValidationObserver ref="formObserver" v-slot="formContext">
@@ -132,6 +135,12 @@ export default {
         'deletable': {
             default: true
         },
+        'tableProperties': {
+            type: Object,
+            default: () => ({
+                vBPopover: '',
+            })
+        },
     },
     data() {
         return {
@@ -147,10 +156,14 @@ export default {
             totalRows: 0,
             tableBusy: false,
             saving: false,
+            rowsSelected: [],
         }
     },
     methods: {
-        insertModel(button) {
+        insertModel(button, modalRecordData) {
+            if (modalRecordData) {
+                this.editModalRecord = { ...this.editModalRecord, ...modalRecordData }
+            } 
             this.editModalTitle = 'Add New ' + this.tableName;
             this.editModalNew = true;
             this.$root.$emit('bv::show::modal', this.id, button);
@@ -318,6 +331,9 @@ export default {
         onContext(ctx) {
             this.context = ctx
         },
+        onRowSelected(item) {
+            this.rowsSelected = item;
+        }
     },
     computed: {
         hasRequireModelField: function() {

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShoplistsTable extends Migration
+class CreateAsksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,16 @@ class CreateShoplistsTable extends Migration
      */
     public function up()
     {
-        Schema::create('shoplists', function (Blueprint $table) {
+        Schema::create('asks', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('vendor_name')->nullable();
-            $table->string('vendor_address')->nullable();
+            $table->integer('sos_id');
+            $table->date('needed_by')->nullable();
+            $table->string('special_instruction')->nullable();
+            $table->tinyInteger('status')->default(0);
+            $table->integer('responded_by')->nullable();
+            $table->json('chat')->nullable();
+            $table->string('receipt_image')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -32,6 +35,6 @@ class CreateShoplistsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shoplists');
+        Schema::dropIfExists('asks');
     }
 }

@@ -36,7 +36,7 @@
                 gridUrlQuery=""
                 :searchable="false"
                 :insertable="false"
-                :deletable="true"
+                :deletable="true"                
             >
             </model-view>
         </b-col></b-row>
@@ -62,7 +62,6 @@ export default {
     ],
     data() {
         return {
-            
             modalFields: [
                 {   
                     fieldType: "model-search-select-field",
@@ -106,7 +105,11 @@ export default {
                     placeholder: "Maximum $ To Spend *",
                     name: "Maximum To Spend",
                     id: "max_dollar",
-                    rules: "required|max:255",
+                    rules: {
+                        required: true,
+                        max: 255,
+                        regex: /^\d{1,4}(\.\d{1,2})?$/,
+                    },
                     required: true,
                     class: "my-3 mr-3",
                     vBPopover: {

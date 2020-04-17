@@ -22,7 +22,7 @@ class SosController extends Controller
      */
     public function index(Request $request)
     {
-        \Validator::make($request->all(), [
+        /*\Validator::make($request->all(), [
             'status' => 'nullable|integer',
         ])->validate();
      
@@ -31,8 +31,15 @@ class SosController extends Controller
         }
         
         return SosResource::collection(auth()->user()->sos);
+        */
     }
 
+    public function sosView(Request $request)
+    {
+        return SosResource::collection(auth()->user()->sos);
+    }
+    
+    /*
     public function pledged()
     {
         return SosResource::collection(auth()->user()->pledged);
@@ -62,6 +69,8 @@ class SosController extends Controller
     {
         //return SosResource::collection(auth()->user()->pledged);
     }
+    */
+    
     
     /**
      * Store a newly created resource in storage.
@@ -158,6 +167,7 @@ class SosController extends Controller
                 Storage::disk('uploads')->delete($sos->$imageField);
             }
         }
+        $sos->shoplistItem()->delete();
         $sos->delete();
         
         return response('', Response::HTTP_OK);

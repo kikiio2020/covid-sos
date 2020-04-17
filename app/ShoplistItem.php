@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class ShoplistItem extends Model
 {
     protected $fillable = [
-        'list_id',
+        'sos_id',
         'item_id',
         'description',
         'quantity',
         'max_dollar',
     ];
     
-    public function shoplist()
+    public function sos()
     {
-        return $this->belongsTo(Shoplist::class, 'list_id', 'id');
+        return $this->belongsTo(Sos::class, 'sos_id', 'id');
     }
     
     public function item()

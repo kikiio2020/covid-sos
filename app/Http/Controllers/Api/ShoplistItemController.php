@@ -8,7 +8,7 @@ use App\Http\Resources\ShoplistItem as ShoplistItemResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
-use App\Shoplist;
+use App\Sos;
 
 class ShoplistItemController extends Controller
 {
@@ -19,12 +19,13 @@ class ShoplistItemController extends Controller
     
     /**
      * Display a listing of the resource.
-     *
+     * @param Sos $sos
+     * 
      * @return \Illuminate\Http\Response
      */
-    public function index(Shoplist $shoplist)
+    public function index(Sos $sos)
     {
-        return ShoplistItemResource::collection($shoplist->shoplistItem()->get());
+        return ShoplistItemResource::collection($sos->shoplistItem()->get());
     }
 
     /**
@@ -64,11 +65,11 @@ class ShoplistItemController extends Controller
      * Update the specified resource in storage.
      *
      * @param  Request  $request
-     * @param Shoplist $shoplist
+     * @param Sos $sos
      * @param ShoplistItem $shoplistItem
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Shoplist $shoplist, ShoplistItem $shoplistItem): Response
+    public function update(Request $request, Sos $sos, ShoplistItem $shoplistItem): Response
     {
         if (!$shoplistItem->id) {
             abort(Response::HTTP_NOT_FOUND);
@@ -91,11 +92,11 @@ class ShoplistItemController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Shoplist $shoplist
+     * @param Sos $sos
      * @param ShoplistItem $shoplistItem
      * @return Response
      */
-    public function destroy(Shoplist $shoplist, ShoplistItem $shoplistItem): Response
+    public function destroy(Sos $sos, ShoplistItem $shoplistItem): Response
     {
         if (!$shoplistItem->id) {
             abort(Response::HTTP_NOT_FOUND);

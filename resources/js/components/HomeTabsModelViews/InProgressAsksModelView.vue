@@ -1,6 +1,6 @@
 <template>
     <model-view
-        id="pledges-model-view"
+        id="asks-in-progress-model-view"
         ref="myModelView"
         table-name=""
         :initial-values="{ 
@@ -30,8 +30,8 @@
             'actions',
         ]"
         :modal-fields="modalFields"
-        api="/webapi/sos"
-        gridUrlQuery="/pledged"
+        api="/webapi/ask"
+        gridUrlQuery="/inProgressView"
         :insertable="false"
         :deletable="false"
         :user-name="userName"

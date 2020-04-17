@@ -1,7 +1,11 @@
 <template>
 <div>
     <div>{{ placeholder }}</div>
-    <b-form-select v-bind="$attrs">
+    <b-form-select 
+        v-bind="$attrs"
+        v-model="vModel"
+        @input="$emit('input', vModel)"
+    >
         <template v-slot:first>
             <b-form-select-option value="null" disabled>-- Please select an option --</b-form-select-option>
         </template>
@@ -11,6 +15,7 @@
 <script>
 export default {
     props: {
+        value: Number,
         placeholder: String, 
     },
     data() {

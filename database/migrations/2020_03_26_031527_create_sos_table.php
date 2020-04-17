@@ -17,24 +17,13 @@ class CreateSosTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->tinyInteger('delivery_option')->default(0);
-            $table->string('delivery_instruction')->nullable();
-            $table->tinyInteger('payment_option')->default(0);
-            $table->string('payment_other_description')->nullable();
-            $table->string('other_instruction')->nullable();
-            //TODO Move to shoplist
             $table->string('vendor_name')->nullable();
-            //TODO Move to shoplist
             $table->string('vendor_address')->nullable();
-            $table->integer('shoplist_id')->nullable();
-            //$table->decimal('total_amount', 4, 2)->nullable();
-            //$table->longText('chat');
-            $table->json('chat')->nullable();
-            $table->string('receipt_image')->nullable();
-            $table->integer('responded_by')->nullable();
-            $table->tinyInteger('status')->default(0);
-            $table->date('needed_by')->nullable();
-            $table->integer('created_by')->nullable();
+            $table->decimal('compensation', 4, 2)->nullable();
+            $table->tinyInteger('delivery_option')->default(0);
+            $table->tinyInteger('payment_option')->default(0);
+            $table->string('other_instruction')->nullable();
+            $table->integer('created_by');
             $table->softDeletes();
             $table->timestamps();
         });

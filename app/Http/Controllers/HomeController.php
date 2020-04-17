@@ -25,7 +25,17 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view(
+            'home', 
+            [
+                'sosOptions' => auth()->user()->sos->map(function ($sos) {
+                    return [
+                        'value' => $sos->id,
+                        'text' => $sos->name,
+                    ];
+                })
+            ]
+        );
     }
     
     public function setstatus()

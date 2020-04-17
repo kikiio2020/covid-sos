@@ -14,6 +14,9 @@ class Sos extends JsonResource
      */
     public function toArray($request)
     {
+        return parent::toArray($request);
+        
+        /*
         $sosObjectArray = parent::toArray($request);
         
         return array_merge($sosObjectArray, [
@@ -21,5 +24,7 @@ class Sos extends JsonResource
             'delivery_option_txt' => __('model.sos.delivery_option.' . $sosObjectArray['delivery_option']),
             'payment_option_txt' => __('model.sos.payment_option.' . $sosObjectArray['payment_option']),
         ]);
+        */
+        
     }
 }

@@ -1,13 +1,16 @@
 <?php 
+use App\Ask;
 use App\Sos;
 
 return [
-    'sos' => [
+    'ask' => [
         'status' => [
-            Sos::STATUS_PENDING => 'Pending',
-            Sos::STATUS_IN_PROGRESS => 'In Progress',
-            Sos::STATUS_COMPLETED => 'Completed',
+            Ask::STATUS_PENDING => 'Pending',
+            Ask::STATUS_IN_PROGRESS => 'In Progress',
+            Ask::STATUS_COMPLETED => 'Completed',
         ],
+    ],
+    'sos' => [
         'delivery_option' => [
             Sos::DELIVARY_OPTION_DOORFRONT => 'Door Front',
             Sos::DELIVARY_OPTION_INTERCOM => 'Intercom',

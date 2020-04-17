@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-class ShoplistObserver
+class AskObserver
 {
     //
 }

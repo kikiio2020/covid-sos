@@ -15,21 +15,14 @@ class Sos extends Model
     public const DELIVARY_OPTION_INTERCOM = 1;
     public const DELIVARY_OPTION_OTHERS = 2;
     
-    public const STATUS_PENDING = 0;
-    public const STATUS_IN_PROGRESS = 1;
-    public const STATUS_COMPLETED = 2;
-    
     protected $table = 'sos';
     
     protected $fillable = [
         'name', 
         'description', 
         'delivery_option', 
-        //'delivery_instruction', 
         'payment_option', 
-        //'payment_other_description', 
         'other_instruction', 
-        //'total_amount', 
         'needed_by', 
         'vendor_name', 
         'vendor_address',
@@ -38,12 +31,22 @@ class Sos extends Model
     
     public function creator()
     {
-        return $this->belongsTo('App\User', 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
     
     public function responder()
     {
-        return $this->belongsTo('App\User', 'responded_by');
+        return $this->belongsTo(User::class, 'responded_by');
+    }
+    
+    public function shoplistItem()
+    {
+        return $this->hasMany(ShoplistItem::class, 'id');
+    }
+    
+    public function ask()
+    {
+        return $this->hasMany(Ask::class, 'id');
     }
     
     public static function getDeliveryOptionsArray(): array

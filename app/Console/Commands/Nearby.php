@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use App\User;
 use Illuminate\Database\Eloquent\Collection;
 use App\Sos;
+use App\Ask;
 
 class Nearby extends Command
 {
@@ -44,19 +45,26 @@ class Nearby extends Command
      */
     public function handle()
     {
+        if ($this->option('user')) {
+            $responder = User::find($this->option('user'));
+            $respoders = new Collection();
+            $respoders->push($responder);
+        } 
+        
+        
         //https://tighten.co/blog/a-mysql-distance-function-you-should-know-about/
         foreach ($responders as $responder) {
             
-            $userId = $responder->id;
+            /*$userId = $responder->id;
             dd(Sos::where('status', '=', Sos::STATUS_COMPLETED )
             ->whereRaw(
                 "responded_by = {$userId} OR created_by = {$userId}"
             )->get());
+            */
             
             
-            
-            $sosQuery = \DB::table('sos')
-                ->leftJoin('users as creator', 'sos.created_by', '=', 'creator.id')
+            $asksQuery = \DB::table('asks')
+                ->leftJoin('users as creator', 'asks.user_id', '=', 'creator.id')
                 //->leftJoin('users as responder', 'sos.responded_by', '=', 'responder.id')
                 
                 ->join('users as responder', function ($join) use ($responder) {
@@ -70,25 +78,26 @@ class Nearby extends Command
                     ST_Distance_Sphere(creator.longlat,responder.longlat) AS dist
                 ')*/
                 ->select([
-                    'sos.*',
+                    'asks.*',
                     'creator.name as creator.name',
                     'creator.address as creator.address',
                 ])
+                ->where('asks.status', Ask::STATUS_PENDING)
                 ->whereRaw('
                     ST_Distance_Sphere(
                         creator.longlat,
                         responder.longlat
                     ) <= 10000'
                 )
-                ->orderBy('sos.needed_by') //asc soonest first
-                ->orderBy('sos.created_at') //asc oldest first
+                ->orderBy('asks.needed_by') //asc soonest first
+                ->orderBy('asks.created_at') //asc oldest first
                 ->limit(10);
                 
-            $sosCollection = $sosQuery->get();
+            $asksCollection = $asksQuery->get();
             
             //Cache::put(User::CACHE_KEY_NEARBY. '-' . $responder->id, serialize($sosCollection));
-            $responder->putNearbyCache($sosCollection);
-            echo "Cache {$sosCollection->count()} records for user {$responder->id}\n";
+            $responder->putNearbyCache($asksCollection);
+            echo "Cache {$asksCollection->count()} records for user {$responder->id}\n";
         }
     }
 }

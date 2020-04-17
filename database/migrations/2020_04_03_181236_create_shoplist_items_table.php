@@ -15,7 +15,7 @@ class CreateShoplistItemsTable extends Migration
     {
         Schema::create('shoplist_items', function (Blueprint $table) {
             $table->id();
-            $table->integer('list_id');
+            $table->integer('sos_id');
             $table->integer('item_id');
             $table->string('description')->nullable();
             $table->string('quantity');

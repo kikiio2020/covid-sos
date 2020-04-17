@@ -19,7 +19,7 @@
 </template>
 <script>
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required, image, size } from 'vee-validate/dist/rules';
+import { required, image, size, regex } from 'vee-validate/dist/rules';
 
 extend('image', image);
 extend('size', size);
@@ -27,6 +27,7 @@ extend('required', {
     ...required,
     message: "{_field_} is required"
 });
+extend('regex', regex);
 
 export default {
     components: {ValidationProvider, ValidationObserver},

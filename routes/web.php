@@ -45,16 +45,32 @@ use Illuminate\Support\Facades\Route;
     '/webapi/sos' => 'Api\SosController',
 ]);*/
 
-\Route::get('webapi/sos/pledged', 'Api\SosController@pledged');
-\Route::get('webapi/sos/need', 'Api\SosController@need');
-\Route::get('webapi/sos/history', 'Api\SosController@history');
-\Route::get('webapi/sos/nearby', 'Api\SosController@nearby');
+/**
+ * webapi/ask
+ **/
+\Route::get('webapi/ask/inProgressView', 'Api\AskController@inProgressView');
+\Route::get('webapi/ask/pendingsView', 'Api\AskController@pendingsView');
+\Route::get('webapi/ask/historyView', 'Api\AskController@historyView');
+\Route::get('webapi/ask/nearbyView', 'Api\AskController@nearbyView');
+\Route::ApiResources([
+    '/webapi/ask' => 'Api\AskController',
+]);
 
-\Route::get('webapi/sos', 'Api\SosController@index');
+/**
+ * webapi/sos
+ **/
+\Route::get('webapi/sos/sosView', 'Api\SosController@sosView');
+\Route::ApiResources([
+    '/webapi/sos' => 'Api\SosController',
+]);
+/*\Route::get('webapi/sos', 'Api\SosController@index');
 \Route::get('webapi/sos/{sos}', 'Api\SosController@show');
 \Route::post('webapi/sos', 'Api\SosController@store');
 \Route::put('webapi/sos/{sos}', 'Api\SosController@update');
 \Route::delete('webapi/sos/{sos}', 'Api\SosController@destroy');
+*/
+
+
 
 //\Route::get('webapi/shoplist/shoplistItem/{shoplist}', 'Api\ShoplistItemController@index');
 /*\Route::resource('/webapi/shoplistItem', 'Api\ShoplistItemController')->only([
@@ -65,10 +81,8 @@ use Illuminate\Support\Facades\Route;
 \Route::resource('/webapi/item', 'Api\ItemController')->only(['index']);
 
 \Route::ApiResources([
-    '/webapi/shoplist/{shoplist}/shoplistItem' => 'Api\ShoplistItemController',
+    '/webapi/sos/{shoplist}/shoplistItem' => 'Api\ShoplistItemController',
 ]);
 
-\Route::ApiResources([
-    '/webapi/shoplist' => 'Api\ShoplistController',
-]);
+
 
