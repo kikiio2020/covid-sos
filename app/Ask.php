@@ -25,6 +25,10 @@ class Ask extends Model
         'requestor_approved',
     ];
     
+    protected $attributes = [
+        'chat' => '[]',
+    ];
+    
     /*public function resolveRouteBinding($value, $field = null)
     {
         return $this->find($value);
@@ -53,6 +57,11 @@ class Ask extends Model
     public function scopeRespondedBy(Builder $query, User $user) 
     {
         return $query->where('responded_by', $user->id);
+    }
+    
+    public function scopePending(Builder $query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
     }
     
     public function scopeInProgress(Builder $query)

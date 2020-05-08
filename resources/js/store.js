@@ -31,7 +31,7 @@ export const store = new Vuex.Store({
 	mutations: {
 		startWorkflow: function(state, workflow) {
 			state.currentWorkflow = workflow;
-			store.commit('currentHomeTabIndex', workflowNewTabIndex[workflow]);
+			store.commit('setHomeTabIndex', workflowNewTabIndex[workflow]);
 		},
 		endWorkflow: function(state) {
 			state.currentWorkflow = '';

@@ -19,6 +19,7 @@ class AsksSeeder extends Seeder
                 'needed_by' => '2020-04-30',
                 'special_instruction' => null,
                 'status' => Ask::STATUS_PENDING,
+                'chat' => '[]',
             ],
         ]);
     }

@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Notifications\RequestCompleted;
 use App\Notifications\RequestPledged;
 use App\Http\Resources\HistoryView;
+use Illuminate\Database\Eloquent\Builder;
 
 class AskController extends Controller
 {
@@ -37,16 +38,17 @@ class AskController extends Controller
         $userId = auth()->user()->id;
         
         return InProgressView::collection(
-            Ask::inProgress()->whereRaw("responded_by = {$userId} OR user_id = {$userId}")->get()
+            Ask::inProgress()->Where(
+                function (Builder $query) use ($userId) {
+                    $query->whereRaw("responded_by = {$userId} OR user_id = {$userId}");
+                }
+            )->get()
         );
     }
     
     public function pendingsView()
     {
-        return AskResource::collection(auth()->user()->ask()->whereIn(
-            'status',
-            [ Ask::STATUS_PENDING ]
-            )->get());
+        return AskResource::collection(auth()->user()->ask()->pending()->get());
     }
     
     public function historyView()
@@ -54,7 +56,9 @@ class AskController extends Controller
         $userId = auth()->user()->id;
         
         return HistoryView::collection(
-            Ask::completed()->whereRaw("responded_by = {$userId} OR user_id = {$userId}")->get()
+            Ask::completed()->where(function(Builder $query) use($userId) {
+                $query->whereRaw("responded_by = {$userId} OR user_id = {$userId}");
+            })->get()
         );
     }
     

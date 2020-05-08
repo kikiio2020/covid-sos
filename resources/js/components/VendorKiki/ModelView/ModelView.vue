@@ -357,21 +357,18 @@ export default {
             axios(options)
                 .then((response) => {
                 	this.saving=false;
-                    if (!this.editModalNew || !this.hasRequireModelField) {
-                        this.$root.$emit('bv::hide::modal', this.id);
-                    }
-                    this.editModalRecord.id = response.data.id;
-                    this.editModalNew = false;
-                    
-                    //this.$root.$emit('bv::refresh::table', 'grid-table');
-                    //this.loadData();
-                    this.$root.$bvToast.toast(successMessage, {
+                	this.$root.$bvToast.toast(successMessage, {
                         title: toasterTitle,
                         variant: 'success',
                     });
                     this.$emit(successEvent, response.data.id);
                     this.$emit('asyncReturns', response.data.id);
-                    this.resetEditModal();
+                	if (!this.editModalNew || !this.hasRequireModelField) {
+                    	this.resetEditModal();
+                    	this.$root.$emit('bv::hide::modal', this.id);
+                    }
+                    this.editModalRecord.id = response.data.id;
+                    this.editModalNew = false;
                 }).catch((error) => {
                     console.log(error);
                     this.saving=false;
@@ -381,7 +378,7 @@ export default {
                     });
                     this.$emit(failEvent, this.editModalRecord.id);
                     this.$emit('asyncReturns', response.data.id);
-                    this.resetEditModal();
+                    //this.resetEditModal();
                 });
         },
         getValidationState({ dirty, validated, valid = null, invalid }) {

@@ -198,29 +198,8 @@ export default {
         actionCompletes: function() {
         	this.$store.commit('endWorkflow');
         }
-    	/*sendRequest: function() {
-            //console.log(this.$refs.myModelView.rowsSelected);
-            //this.$refs.asksModelView.insertModel();
-
-            if (
-                this.$refs.myModelView.rowsSelected 
-                && this.$refs.myModelView.rowsSelected.length 
-            ) {
-                const sosId = this.$refs.myModelView.rowsSelected[0].id;
-                this.$emit('sosCreatesNewAsk', {
-                    sos_id: sosId
-                });
-            }
-        }*/
     },
     computed: {
-        rowsSelected: function() {
-            if (this.$refs.myModelView && this.$refs.myModelView.rowsSelected ) {
-                return this.$refs.myModelView.rowsSelected;
-            } else {
-                return {};
-            }
-        },
     },
     mounted() {
     }

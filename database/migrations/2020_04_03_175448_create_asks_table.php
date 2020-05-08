@@ -22,7 +22,8 @@ class CreateAsksTable extends Migration
             $table->string('special_instruction')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('responded_by')->nullable();
-            $table->json('chat')->default(new Expression('(JSON_ARRAY())'));
+            //$table->json('chat')->default(new Expression('(JSON_ARRAY())'));
+            $table->json('chat');
             $table->string('receipt_image')->nullable();
             $table->date('user_approved')->nullable();
             $table->date('responder_approved')->nullable();

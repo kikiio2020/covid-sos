@@ -28,9 +28,12 @@ class InProgressView extends JsonResource
             'requester' => $this->resource->user->id == $userId ?
                 'Yourself' :
                 $this->resource->user->getUserName(),
-            'responder' => $this->resource->responded_by == $userId ?
-                'Yourself' :
-                $this->resource->responder->getUserName(), 
+            'responder' => $this->resource->responded_by ?
+                (
+                    $this->resource->responded_by == $userId ?
+                        'Yourself' :
+                        $this->resource->responder->getUserName()
+                ) : '', 
             'status_txt' => __('model.ask.status.' . $askObjectArray['status']),
         ]);
     }
