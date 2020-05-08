@@ -12,7 +12,7 @@
             :user-name="userName"
             :api="api"
             v-b-popover="modalFieldComponentProperties.vBPopover"
-        ></component>
+        >{{modalFieldComponentProperties.content}}</component>
     
         <b-form-invalid-feedback id="feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
     </ValidationProvider>
@@ -41,6 +41,7 @@ export default {
         modelId: Number,
         userName: String,
         api: String,
+        vSlot: String,
     },
     data() {
         return {
@@ -64,6 +65,7 @@ export default {
         }
     },
     mounted() {
+    	console.log(this.modalFieldComponentProperties.content);
     },
 }
 </script>

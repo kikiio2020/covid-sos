@@ -1,18 +1,20 @@
 <template>
 <div>
-<home-buttons-bar
+<!-- <home-buttons-bar
     v-on:SosClick="onSosClick"
 ></home-buttons-bar>
+ -->
 <b-container>
     <b-row>
         <b-col>
-            <b-tabs content-class="mt-3">
+            <b-tabs content-class="mt-3" v-model="currentHomeTabIndex">
+                <!-- :active="isResponder" :disabled="!isResponder"  -->
                 <b-tab title="Nearby Needs!" :active="isResponder" :disabled="!isResponder" lazy ref="nearbyAsksView">
                     <nearby-asks-model-view
                         :is-responder="isResponder"
                         :user-id="userId"
                         ref="nearbyAsksModelView"
-                        @nearbyNewPledged="newPledged($event)"
+                        @nearbyNewPledged="newPledged"
                     ></nearby-asks-model-view>
                 </b-tab>
                 <b-tab title="In Progress" lazy ref="inProgressAsksView">
@@ -20,15 +22,17 @@
                         :is-responder="isResponder"
                         :delivery-options="deliveryOptions"
                         :payment-options="paymentOptions"
+                        :user-id="userId"
                         :user-name="userName"
-                        ref="asksInProgressModelView"
+                        ref="inProgressAsksModelView"
                     ></in-progress-asks-model-view>
                 </b-tab>
+                <!-- :active="!isResponder" -->
                 <b-tab title="Pendings" :active="!isResponder" lazy ref="pendingAsksView">
                     <pending-asks-model-view
                         :is-responder="isResponder"
                         :sos-options="sosOptions"
-                        ref="asksPendingModelView"
+                        ref="pendingAsksModelView"
                     ></pending-asks-model-view>
                 </b-tab>
                 <b-tab title="Manage my SOSs" lazy ref="sosView">
@@ -40,17 +44,14 @@
                         @sosCreatesNewAsk="newAsk($event)"
                     ></sos-model-view>
                 </b-tab>
-                <b-tab title="History" lazy>
-                    <!--<history-model-view
-                        :is-responder="isResponder"
-                        :delivery-options="deliveryOptions"
-                        :payment-options="paymentOptions"
-                    ></history-model-view>-->
+                <b-tab title="History" lazy ref="historyView">
+                    <history-model-view></history-model-view>
                 </b-tab>
             </b-tabs>
         </b-col>
     </b-row>
 </b-container>
+<!-- 
 <b-modal id="confirm-create-sos-modal" size="sm" centered hide-footer>
     <template v-slot:modal-title>
         Choose option:
@@ -62,10 +63,12 @@
         </b-col></b-row>
     </b-container>
 </b-modal>
+ -->
 </div>
 </template>
 <script>
-window.bus = new Vue();
+import {homeTabIndex} from '../store';
+
 export default {
     components: {},
     props: [
@@ -81,6 +84,7 @@ export default {
         }
     },
     methods: {
+        /*
         onSosClick: function() {
             if (this.sosOptions.length) {
                 this.$bvModal.show('confirm-create-sos-modal');
@@ -96,18 +100,36 @@ export default {
         existingSos: function(){
             this.$bvModal.hide('confirm-create-sos-modal');
         },
+        */
         newAsk: function(data) {
-            this.$refs.pendingAsksView.activate(function(){});
+            this.$store.commit('startWorkflow', 'sosCreateNewAsk');
+        	//this.$refs.pendingAsksView.activate(function(){});
             this.$nextTick(function () {
-                this.$refs.asksPendingModelView.insertModel({}, data);
+                this.$refs.pendingAsksModelView.insertModel({}, data);
             })
         },
-        newPledged:function(data) {
-            this.$refs.inProgressAsksView.activate(function(){});
+        newPledged:function() {
+        	//this.$store.commit('startWorkflow', 'nearbyCreateNewPledge');
+        	//this.$refs.inProgressAsksView.activate(function(){});
+        	this.$store.commit('setHomeTabIndex', homeTabIndex.inProgress);
         },
+        /*inProgressAsksModalClose:function() {
+        	console.log('inProgressAsksModalClose');	
+        },*/
+        
     },
-    computed: {},
+    computed: {
+    	currentHomeTabIndex: {
+    		get () {
+    			return this.$store.state.currentHomeTabIndex;
+    		},
+    		set (value) {
+    			this.$store.commit('setHomeTabIndex', value);
+    		}
+    	}
+    },
     mounted() {
+    	
     },
 }
 </script>

@@ -59,15 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Ask::class, 'user_id');
     }
+
+    public function pledges()
+    {
+        return $this->hasMany(Ask::class, 'responded_by');
+    }
     
     public function sos()
     {
         return $this->hasMany(Sos::class, 'created_by');
-    }
-    
-    public function pledges()
-    {
-        return $this->hasMany(Sos::class, 'responded_by');
     }
     
     public static function getNearbyCacheKey(int $userId): string

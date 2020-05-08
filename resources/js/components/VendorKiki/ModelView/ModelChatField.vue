@@ -1,26 +1,25 @@
 <template>
     <div>
-        <strong>{{placeHolder}}:</strong>
+        <strong>{{placeholder}}:</strong>
         <b-container>
             <b-row><b-col>
                 <div 
                     style="overflow-y: scroll; height:7em;"
                     id="chatList"
                     rows="5"
-                    readonly
                     class="border border-secondary"
                     v-html="formatedChat()"
                 ></div>
             </b-col></b-row>
-            <b-row><b-col class="text-right">
+            <b-row v-if="!readonly"><b-col >
                 <ValidationProvider :name="caption" rules="max:60" v-slot="validationContext">
-                    Enter Message:
                     <b-form-textarea
                         id="inputBox"
                         rows="2"
                         v-model="chatInput"
                         :state="getValidationState(validationContext)"
                         aria-describedby="feedback"
+                        placeholder="Enter Message"
                     ></b-form-textarea>
                     <b-form-invalid-feedback id="feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                     <b-button
@@ -58,13 +57,14 @@ export default {
         name: String, 
         userName: String,
         caption: String, 
-        placeHolder: String, 
+        placeholder: String, 
         disabled: {
             default: false
         }, 
         api: String,
         value: {},
-        modelId: Number
+        modelId: Number,
+        readonly: false,
     },
     data() {
         return {
@@ -116,7 +116,8 @@ export default {
                 }
                 chatLogFormated = chatFormated + '<br>' + chatLogFormated;
             });
-
+            chatLogFormated = chatLogFormated ? chatLogFormated : '<small class="text-muted">This is start of your conversation...</small>';
+            
             return chatLogFormated;
         }
     },
@@ -126,7 +127,7 @@ export default {
         },
     },
     mounted() {
-        /*axios.get(this.modelApi).then(response => {
+    	/*axios.get(this.modelApi).then(response => {
             this.modelExists = true;
             if (response.data.data[this.id]) {
                 this.imageSrc = this.getModelImageApi();

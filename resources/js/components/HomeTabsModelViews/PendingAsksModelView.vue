@@ -19,17 +19,18 @@
                 label: 'Name',
                 sortable: true,
             },
-            {
-                key: 'status_txt',
-                label: 'Status',
-                sortable: true,
-            },
             'actions',
+        ]"
+        :actions="[
+        	'edit',
+        	'remove',	
         ]"
         :modal-fields="modalFields"
         api="/webapi/ask"
         gridUrlQuery="/pendingsView"
         :insertable="!isResponder"
+        @modalClose="actionCancel"
+        @asyncReturns="actionCompletes"
     >
     </model-view>
 </template>
@@ -63,7 +64,7 @@ export default {
                     class: "my-3 mr-3",
                 },
                 {
-                    fieldType: "b-calendar",
+                    fieldType: "b-form-datepicker",
                     caption: "Needed By",
                     placeholder: "Needed By Date:",
                     name: "needed_by",
@@ -93,6 +94,12 @@ export default {
         },
         onSave() {
         },
+        actionCompletes: function() {
+        	this.$store.commit('endWorkflow');
+        },
+        actionCancel: function() {
+        	this.$store.commit('workflowCancel');
+        }
     },
     computed: {},
     mounted() {

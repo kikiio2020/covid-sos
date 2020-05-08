@@ -20,11 +20,24 @@ class Ask extends Model
         'status',
         'special_instruction',
         'responded_by',
+        'chat',
+        'user_approved',
+        'requestor_approved',
     ];
+    
+    /*public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->find($value);
+    }*/
     
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    
+    public function responder()
+    {
+        return $this->belongsTo(User::class, 'responded_by');
     }
     
     public function sos()

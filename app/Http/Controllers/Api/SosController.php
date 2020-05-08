@@ -84,7 +84,6 @@ class SosController extends Controller
             'name' => 'required',
             'delivery_option' => 'required',
             'payment_option' => 'required',
-            'chat' => 'nullable|json',
         ])->validate();
         
         $sos = new Sos();
@@ -92,7 +91,7 @@ class SosController extends Controller
         $sos->created_by = auth()->user()->id;
         $sos->save();
         
-        return response('', Response::HTTP_CREATED);
+        return response(new SosResource($sos), Response::HTTP_CREATED);
     }
 
     /**
@@ -124,33 +123,14 @@ class SosController extends Controller
             'name' => 'sometimes|required',
             'delivery_option' => 'sometimes|required',
             'payment_option' => 'sometimes|required',
-            'chat' => 'nullable|json',
         ])->validate();
         
         $sos->fill($request->all());
-        $sos->chat = $this->truncateChat(json_decode($request->chat));
         $sos->save();
         
-        return response('', Response::HTTP_OK);
+        return response(new SosResource($sos), Response::HTTP_OK);
     }
     
-    private function truncateChat(array $chat): array
-    {
-        return array_slice(
-            array_map(
-                function($item){
-                    if ($item->message) {
-                        $item->message = substr($item->message, 0, 250);
-                    }
-                    return $item;
-                },
-                $chat
-            ), 
-            0, 
-            100
-        );
-    }
-
     /**
      * Remove the specified resource from storage.
      *

@@ -41,7 +41,7 @@ class Sos extends Model
     
     public function shoplistItem()
     {
-        return $this->hasMany(ShoplistItem::class, 'id');
+        return $this->hasMany(ShoplistItem::class, 'sos_id', 'id');
     }
     
     public function ask()

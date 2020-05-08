@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Ask;
+use App\Http\Middleware\RequestStatusCanView;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,12 @@ use Illuminate\Support\Facades\Route;
 \Route::get('/setstatus', 'HomeController@setstatus')->name('setstatus');
 \Route::get('/profile', 'HomeController@profile')->name('profile');
 \Route::get('/shoplist', 'HomeController@shoplist')->name('shoplist');
+\Route::get('/ask/{ask}/inProgress', 'HomeController@askStandAloneInProgressView')
+    ->middleware(RequestStatusCanView::class . ':' . Ask::STATUS_IN_PROGRESS)    
+    ->name('askStandAloneInProgressView');
+\Route::get('/ask/{ask}/history', 'HomeController@askStandAloneHistoryView')
+->middleware(RequestStatusCanView::class . ':' . Ask::STATUS_COMPLETED)
+    ->name('askStandAloneHistoryView');
 
 //\Route::get('/webapi/users/', 'Api\UserController@show');
 \Route::put('/webapi/user/status', 'Api\UserController@updateStatus');
@@ -52,6 +60,9 @@ use Illuminate\Support\Facades\Route;
 \Route::get('webapi/ask/pendingsView', 'Api\AskController@pendingsView');
 \Route::get('webapi/ask/historyView', 'Api\AskController@historyView');
 \Route::get('webapi/ask/nearbyView', 'Api\AskController@nearbyView');
+\Route::put('webapi/ask/pledgeRequest/{ask}', 'Api\AskController@pledgeAsk');
+\Route::put('webapi/ask/completeRequest/{ask}', 'Api\AskController@completeAsk');
+
 \Route::ApiResources([
     '/webapi/ask' => 'Api\AskController',
 ]);
@@ -60,17 +71,14 @@ use Illuminate\Support\Facades\Route;
  * webapi/sos
  **/
 \Route::get('webapi/sos/sosView', 'Api\SosController@sosView');
-\Route::ApiResources([
+/*\Route::ApiResources([
     '/webapi/sos' => 'Api\SosController',
-]);
-/*\Route::get('webapi/sos', 'Api\SosController@index');
+]);*/
+\Route::get('webapi/sos', 'Api\SosController@index');
 \Route::get('webapi/sos/{sos}', 'Api\SosController@show');
 \Route::post('webapi/sos', 'Api\SosController@store');
 \Route::put('webapi/sos/{sos}', 'Api\SosController@update');
 \Route::delete('webapi/sos/{sos}', 'Api\SosController@destroy');
-*/
-
-
 
 //\Route::get('webapi/shoplist/shoplistItem/{shoplist}', 'Api\ShoplistItemController@index');
 /*\Route::resource('/webapi/shoplistItem', 'Api\ShoplistItemController')->only([
@@ -81,7 +89,7 @@ use Illuminate\Support\Facades\Route;
 \Route::resource('/webapi/item', 'Api\ItemController')->only(['index']);
 
 \Route::ApiResources([
-    '/webapi/sos/{shoplist}/shoplistItem' => 'Api\ShoplistItemController',
+    '/webapi/sos/{sos}/shoplistItem' => 'Api\ShoplistItemController',
 ]);
 
 

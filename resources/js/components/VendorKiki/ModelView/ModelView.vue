@@ -38,8 +38,26 @@
             @row-selected="onRowSelected"
         >
             <template v-slot:cell(actions)="row">
-                <b-icon-pen v-if="editable" class="button" @click="editModel(row.item, $event.target)"></b-icon-pen>
-                <b-icon-trash v-if="deletable" class="button" @click="confirmRemoveModel(row.item.id)"></b-icon-trash>
+                <b-dropdown no-caret variant="primary" size="sm">
+					<template v-slot:button-content>
+				    	<b-icon-caret-down></b-icon-caret-down>
+				    </template>
+					<b-dropdown-item 
+						v-for="(action, index) in actions"
+						@click="rowAction(action, row, $event.target)"
+						:key="row.item.id + index"
+						variant="primary"
+					>
+						<div v-if="'edit'==action"><b-icon-pen></b-icon-pen> Edit</div>
+                		<div v-else-if="'details'==action"><b-icon-card-list></b-icon-card-list> Details</div>
+                		<div v-else-if="'remove'==action"><b-icon-trash></b-icon-trash> Delete</div>
+                		<div v-else>
+                			<b-icon v-if="action.icon" :icon="action.icon"></b-icon> 
+                			<i v-if="action.fontawesome" :class="action.fontawesome"></i>
+                			{{action.text}}
+               			</div>
+					</b-dropdown-item>
+  				</b-dropdown>
             </template>   
         </b-table>
         <b-pagination
@@ -50,7 +68,7 @@
             align="right"
         ></b-pagination>
         <!-- Edit modal -->
-        <b-modal :id="id" :size='modalSize' :title="editModalTitle" ok-title="Save" @hide="resetEditModal();loadData();" no-close-on-backdrop>
+        <b-modal :id="id" :size='modalSize' :title="editModalTitle" ok-title="Save" @hide="handleModalHide" no-close-on-backdrop>
             <ValidationObserver ref="formObserver" v-slot="formContext">
                 <b-form ref="form" v-on="getFormValidationState(formContext)" @submit.stop.prevent="handleSubmit">
                     
@@ -73,10 +91,17 @@
             <template v-slot:modal-footer>
                 <div class="w-100 text-right">
                     <b-button 
+                    	v-for="(button, key) in buttons" 
+                    	:key="button.id" 
+                    	v-bind="button"
+                    	@click="$emit(button.event, editModalRecord)"
+                   	>{{button.content}}</b-button>
+                    <b-button 
                         variant="secondary"
                         @click="handleClose"
                     >Close</b-button>
                     <b-button
+                        v-if="!editModalReadOnly"
                         variant="primary"
                         @click="handleSave"
                         :disabled="saving || formInvalid"
@@ -102,12 +127,41 @@ extend('required', {
     message: "{_field_} is required"
 });
 
+/*
+const actionDropdown = Vue.component('action-dropdown', {
+	render: function (createElement) {
+		//return createElement('b-icon', {attrs:{icon: 'tag'}});
+		return createElement(
+				'b-dropdown', 
+				{
+					attrs: {
+						noCaret: true,
+						variant: 'primary',
+						size: 'sm'
+					}
+				},
+				[
+					createElement('template', {attrs:{'v-slot:button-content': true}},
+						createElement('b-icon-caret-down')		
+					),
+					createElement('b-dropdown-item', 'hello')
+				]
+			);
+	}
+});
+*/
 export default {
-    components: {BTable, ValidationProvider, ValidationObserver},
+    components: {
+    	BTable, 
+    	ValidationProvider, 
+    	ValidationObserver,
+   	},
     props: {
         'id': String,
         'tableName': String,
         'gridFields': {},
+        'actions': {},
+        'buttons': {},
         'modalFields': {},
         'initialValues': {
             default: {
@@ -129,12 +183,6 @@ export default {
         'insertable': {
             default: true
         },
-        'editable': {
-            default: true
-        },
-        'deletable': {
-            default: true
-        },
         'tableProperties': {
             type: Object,
             default: () => ({
@@ -150,6 +198,7 @@ export default {
             originalModalRecord: JSON.parse(JSON.stringify(this.initialValues)),
             editModalTitle: '',
             editModalNew: false,
+            editModalReadOnly: false,
             formInvalid: true,
             rowPerPage: this.perPage,
             currentPage: 1,
@@ -160,19 +209,34 @@ export default {
         }
     },
     methods: {
+        rowAction(action, row, eventTarget) {
+        	if (typeof this[action] === 'function') {
+        		this[action](row, eventTarget);
+       		} else {
+     			this.$emit(action.event, row.item);
+       		}	
+        },
+        details(row, button) {
+        	this.editModalRecord = row.item;
+            this.editModalTitle = 'Details '+ this.tableName;
+            this.editModalReadOnly = true;
+            this.$root.$emit('bv::show::modal', this.id, button);
+        },
         insertModel(button, modalRecordData) {
             if (modalRecordData) {
                 this.editModalRecord = { ...this.editModalRecord, ...modalRecordData }
             } 
             this.editModalTitle = 'Add New ' + this.tableName;
             this.editModalNew = true;
+            this.editModalReadOnly = false;
             this.$root.$emit('bv::show::modal', this.id, button);
         },
-        editModel(item, button) {
-            this.editModalRecord = item;
+        edit(row, button) {
+            this.editModalRecord = row.item;
             //this.setOriginalModalRecord(item);
             this.editModalTitle = 'Edit '+ this.tableName;
             this.editModalNew = false;
+            this.editModalReadOnly = false;
             this.$root.$emit('bv::show::modal', this.id, button);
         },
         setOriginalModalRecord(original) {
@@ -184,10 +248,12 @@ export default {
 
             return this.originalModalRecord;
         },
-        confirmRemoveModel(id) {
+        remove(row) {
             this.$bvModal.msgBoxConfirm('Remove ' + this.tableName + '?')
                 .then(value => {
-                    this.removeModel(id);
+                    if (value) {
+                    	this.removeModel(row.item.id);	
+                    }
                 })
                 .catch(err => {
                     console.log(err);
@@ -202,12 +268,16 @@ export default {
                     });
                     this.loadData();
                     //this.$root.$emit('bv::refresh::table', 'grid-table');
+                    this.$emit('recordRemoved', id);
+                    this.$emit('asyncReturns', id);
                 }).catch((error) => {
                     console.log(error);
                     this.$root.$bvToast.toast('Remove ' + this.tableName + ' failed', {
                         title: 'Remove ' + this.tableName,
                         variant: 'danger',
                     });
+                    this.$emit('recordRemoveFailed', id);
+                    this.$emit('asyncReturns', id);
                 });
         },
         resetEditModal() {
@@ -219,8 +289,14 @@ export default {
             return valid
         },
         handleClose(){
-            this.$root.$emit('bv::hide::modal', this.id);
+        	this.$root.$emit('bv::hide::modal', this.id);
             //this.$root.$emit('bv::refresh::table', 'grid-table');
+        },
+        handleModalHide() {
+        	//triggered by modal hide
+        	this.resetEditModal();
+        	this.loadData();
+        	this.$emit('modalClose');
         },
         handleSave(bvModalEvt) {
             bvModalEvt.preventDefault();
@@ -256,19 +332,22 @@ export default {
             });*/
             var formData = this.editModalRecord;
             if (this.editModalNew) {
-                var verb = 'POST';
+            	var verb = 'POST';
                 var apiUrl = this.api;
                 var toasterTitle = 'Insert New ' + this.tableName;
                 var successMessage = 'New '+ this.tableName + ' Successfully Created!';
                 var failMessage = 'New ' + this.tableName + ' Creation Failed! Please try again or contact the site admin.';
+                var successEvent = 'recordCreated';
+                var failEvent = 'recordCreateFailed';
             } else {
                 var verb = 'PUT';
                 var apiUrl = this.api + '/' + this.editModalRecord.id;
                 var toasterTitle = 'Update ' + this.tableName;
                 var successMessage = this.tableName + ' Successfully Updated!';
                 var failMessage = this.tableName + ' Update Failed! Please try again or contact the site admin.';
+                var successEvent = 'recordUpdated';
+                var failEvent = 'recordUpdateFailed';
             }
-
             const options = {
                 method: verb,
                 //headers: { 'content-type': 'multipart/form-data' },
@@ -277,7 +356,7 @@ export default {
             };
             axios(options)
                 .then((response) => {
-                    this.saving=false;
+                	this.saving=false;
                     if (!this.editModalNew || !this.hasRequireModelField) {
                         this.$root.$emit('bv::hide::modal', this.id);
                     }
@@ -290,6 +369,9 @@ export default {
                         title: toasterTitle,
                         variant: 'success',
                     });
+                    this.$emit(successEvent, response.data.id);
+                    this.$emit('asyncReturns', response.data.id);
+                    this.resetEditModal();
                 }).catch((error) => {
                     console.log(error);
                     this.saving=false;
@@ -297,6 +379,9 @@ export default {
                         title: toasterTitle,
                         variant: 'danger',
                     });
+                    this.$emit(failEvent, this.editModalRecord.id);
+                    this.$emit('asyncReturns', response.data.id);
+                    this.resetEditModal();
                 });
         },
         getValidationState({ dirty, validated, valid = null, invalid }) {

@@ -1,18 +1,6 @@
 <template>
 <b-container>
     <b-row><b-col class="text-left">
-        <b-button
-            variant="primary"
-            v-b-popover="{
-                        trigger: 'hover',
-                        content: 'Select a request and click to help out!',
-                        placement: 'right',
-                        variant: 'primary'
-                    }"
-            @click="makePledge"
-        >Make a Pledge</b-button>
-    </b-col></b-row>
-    <b-row><b-col class="text-left">
         <model-view
             id="nearby-model-view"
             ref="myModelView"
@@ -37,27 +25,26 @@
                     sortable: true,
                 },
                 {
-                    key: 'vendor', 
-                    sortable: true,
-                },
-                {
-                    key: 'creator', 
-                    label: 'User',
-                    sortable: true,
-                },
-                {
                     key: 'distance_km', 
                     label: 'Distance (KM)',
                     sortable: true,
                 },
-
+                'actions',
             ]"
+            :actions="[
+	        	'details',
+	        	{
+	        		text: 'Pledge',
+	        		event: 'pledgeRequest',
+	        		fontawesome: 'fas fa-hands-helping',
+	        	},
+	       	]"
             :modal-fields="modalFields"
             api="/webapi/ask"
             gridUrlQuery="/nearbyView"
             :insertable="false"
-            :deletable="false"
             :table-properties="tableProperties"
+			@pledgeRequest="pledgeRequest"            
         >
         </model-view>
     </b-col></b-row>
@@ -82,8 +69,8 @@ export default {
 
         return {
             tableProperties: {
-                    selectable: true,
-                    selectMode: "single",
+                    //selectable: true,
+                    //selectMode: "single",
             },
             modalFields: [
                 {   
@@ -133,23 +120,13 @@ export default {
                     name: "special_instructions",
                     id: "special_instructions"
                 },
-                {
-                    fieldType: "model-chat-field",
-                    placeholder: "Communication",
-                    caption: "Message",
-                    name: "chat",
-                    id: "chat",
-                },
-                {
-                    fieldType: "selectRadioButtons"
-                }
             ],
         }
     },
     methods: {
-        makePledge() {
+        pledgeRequest(request) {
             this.$bvModal.msgBoxConfirm(
-                'Make a pledge to ' + this.rowsSelected[0].creator + '?', 
+                'Make a pledge to ' + request.creator + '?', 
                 {
                     title: 'Confirm Pledge',
                     headerBgVariant: 'primary',
@@ -167,12 +144,13 @@ export default {
             ).then(confirm => {
                 if (confirm) {
                     axios.put(
-                        '/webapi/ask/' + this.rowsSelected[0].id, 
+                        '/webapi/ask/pledgeRequest' + request.id
+                        /*, 
                         {
-                            id: this.rowsSelected[0].id,
+                            id: request.id,
                             status: 1,
                             responded_by: this.userId
-                        }
+                        }*/
                     ).then(response => {
                         this.$root.$bvToast.toast('Pledge sent to user', {
                             title: 'Thank you!',
@@ -180,7 +158,7 @@ export default {
                         });
                         this.$bvModal.msgBoxOk(
                             'Thanks for helping out! Your pledge will be sent to the user and you can start ' +
-                            'communicating the delivery details by selecting the record in the "In Progress" tab.',
+                            'communicating the delivery details by going to the request Details in the "In Progress" tab.',
                             {
                                 title: 'Pledge Sent',
                                 headerBgVariant: 'primary',
@@ -193,14 +171,11 @@ export default {
                             }
                         ).then((confirm) =>{
                             this.$emit('nearbyNewPledged', {
-                                id: this.rowsSelected[0].id,
+                                id: request.id,
                             });
                         }).catch(err => {
                             // An error occurred
-                        }
-                        );
-                        
-                        //TODO switch view to in progress
+                       	});
                     }).catch(error => {
                         console.log(error);
                         this.$root.$bvToast.toast('Pledging failed', {
@@ -214,10 +189,10 @@ export default {
             })
             
             
-            
             //console.log(this.$refs.myModelView.rowsSelected);
         
-            if (
+            //this.$emit('nearbyNewpledge');
+            /*if (
                 this.$refs.myModelView.rowsSelected 
                 && this.$refs.myModelView.rowsSelected.length 
             ) {
@@ -225,15 +200,7 @@ export default {
                 this.$emit('nearbyNewpledge', {
                     id: id
                 });
-            }
-        },
-        insertModel(target) {
-            this.$refs.myModelView.insertModel(target);
-        },
-        pledge(){
-
-        },
-        onSave() {
+            }*/
         },
     },
     computed: {

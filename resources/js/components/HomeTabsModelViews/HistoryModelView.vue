@@ -1,36 +1,59 @@
 <template>
     <model-view
+       	id="asks-history-model-view"
         ref="myModelView"
         table-name=""
         :initial-values="{ 
             id: 0, 
-            name: '', 
+            sos_text: '', 
             description: '',
             needed_by: new Date(),
             vendor_name: '',
             vendor_address: '',
             delivery_option: null,
             payment_option: null,
+            special_instructions: null,
+            chat: null,
+            user_approved: new Date(),
+			responder_approved: new Date(),
         }"
         :grid-fields="[
             {
-                key: 'needed_by',
+                key: 'fulfilled_date',
+                label: 'Fulfilled',
                 sortable: true,
             },
             {
-                key: 'name', 
+                key: 'sos_text',
+                label: 'Name', 
                 sortable: true,
             },
             {
-                key: 'status_txt',
-                label: 'Status',
+                key: 'requester',
+                sortable: true,
+            },
+            {
+                key: 'responder',
                 sortable: true,
             },
             'actions',
         ]"
+        :actions="[
+        	'details',
+       	]"
+       	:buttons="[
+       		{
+       			id:'1',
+       			variant: 'primary',
+                content: 'Full View',
+                event: 'openFullView'
+       		}
+       	]"
         :modal-fields="modalFields"
-        api="/webapi/sos"
-        gridUrlQuery="/history"
+        api="/webapi/ask"
+        gridUrlQuery="/historyView"
+        :insertable="false"
+        @openFullView="openFullView"
     >
     </model-view>
 </template>
@@ -39,9 +62,6 @@
 export default {
     components: {},
     props: [
-        'isResponder',
-        'deliveryOptions', 
-        'paymentOptions',
     ],
     data() {
         const now = new Date();
@@ -52,87 +72,70 @@ export default {
 
         return {
             modalFields: [
+            	{   
+                    fieldType: "model-read-only-field",
+                    placeholder: "Request",
+                    name: "sos_text",
+                    id: "sos_text"
+                },
                 {   
-                    fieldType: "b-form-input",
-                    caption: "Request Name",
-                    placeHolder: "Request Name",
-                    required: true,
-                    rules: "required",
-                    name: "name",
-                    id: "name",
-                    class: "my-3 mr-3",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Request Description",
+                    name: "sos_description",
+                    id: "sos_description"
                 },
                 {
-                    fieldType: "b-form-textarea",
-                    caption: "Request Description",
-                    placeHolder: "Request Description",
-                    name: "description",
-                    id: "description",
-                    class: "my-3 mr-3",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Signed off by responder",
+                    name: "responder_approved",
+                    id: "responder_approved",
+                    
                 },
                 {
-                    fieldType: "b-calendar",
-                    caption: "Needed By",
-                    placeHolder: "Needed By Date:",
-                    name: "needed_by",
-                    id: "needed_by",
-                    dateMin: minNeededByDate,
-                    dateMax: maxNeededByDate,
+                    fieldType: "model-read-only-field",
+                    placeholder: "Signed off by requester",
+                    name: "requester_approved",
+                    id: "requester_approved",
+                    
                 },
                 {
-                    fieldType: "b-form-input",
-                    caption: "Vendor Name",
-                    placeHolder: "Vendor Name",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Vendor",
                     name: "vendor_name",
-                    id: "vendor_name",
-                    class: "my-3 mr-3",
+                    id: "vendor_name"
                 },
                 {
-                    fieldType: "b-form-input",
-                    caption: "Vendor Address",
-                    placeHolder: "Vendor Address",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Vendor Address",
                     name: "vendor_address",
-                    id: "vendor_address",
-                    class: "my-3 mr-3",
+                    id: "vendor_address"
                 },
                 {
-                    fieldType: "b-form-select",
-                    caption: "Delivery Option",
-                    name: "Delivery Option",
-                    placeHolder: "Delivery Option:",
-                    id: "delivery_option",
-                    required: true,
-                    rules: "required",
-                    options: this.deliveryOptions,
-                    class: "my-3 mr-3",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Payment",
+                    name: "payment_option",
+                    id: "payment_option"
                 },
                 {
-                    fieldType: "b-form-select",
-                    caption: "Payment Option",
-                    name: "Payment Option",
-                    placeHolder: "Payment Option:",
-                    id: "payment_option",
-                    required: true,
-                    rules: "required",
-                    options: this.paymentOptions,
-                    class: "my-3 mr-3",
-                },
-                {
-                    fieldType: "b-form-textarea",
-                    caption: "Special Instructions",
-                    placeHolder: "Special Instructions",
+                    fieldType: "model-read-only-field",
+                    placeholder: "Special Instructions",
                     name: "special_instructions",
-                    id: "special_instructions",
-                    class: "my-3 mr-3",
+                    id: "special_instructions"
+                },
+                {
+                    fieldType: "model-chat-field",
+                    placeholder: "Communication",
+                    caption: "Message",
+                    name: "chat",
+                    id: "chat",
+                    readonly: true,
                 },
             ],
         }
     },
     methods: {
-        insertModel(target) {
-            this.$refs.myModelView.insertModel(target);
-        },
-        onSave() {
+    	openFullView(data) {
+        	window.open('/ask/' + data.id + '/history', '_blank');
         },
     },
     computed: {},

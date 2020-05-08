@@ -8,7 +8,7 @@
                 table-name=""
                 :initial-values="{ 
                     item_id: 0, 
-                    list_id: modelId,
+                    sos_id: modelId,
                     description: '',
                     quantity: '',
                     max_dollar: '',
@@ -19,10 +19,6 @@
                         sortable: true
                     },
                     {
-                        key: 'description',
-                        label: 'Description'
-                    },
-                    {
                         key: 'quantity',
                     },
                     {
@@ -31,12 +27,15 @@
                     },
                     'actions',
                 ]"
+                :actions="[
+		        	'edit',
+		        	'remove',
+		       	]"
                 :modal-fields="modalFields"
                 :api="api + '/' + modelId + '/shoplistItem'"
                 gridUrlQuery=""
                 :searchable="false"
                 :insertable="false"
-                :deletable="true"                
             >
             </model-view>
         </b-col></b-row>
@@ -148,6 +147,7 @@ export default {
     },
     mounted() {
         //this.getShoplistItemOptions();
+        console.log(this.modelId);
     }
 }
 </script>

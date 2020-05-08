@@ -96,5 +96,7 @@ return [
             resource_path('views/vendor/mail'),
         ],
     ],
+    
+    'subjectPrefix' => '[' . env('APP_NAME') . ']: ',
 
 ];

@@ -37,7 +37,7 @@ class ShoplistItemController extends Controller
     public function store(Request $request): Response
     {
         \Validator::make($request->all(), [
-            'list_id' => 'required|integer',
+            'sos_id' => 'required|integer',
             'item_id' => 'required|integer',
             'quantity' => 'required',
             'max_dollar' => 'required|regex:/^\d{1,4}(\.\d{1,2})?$/',

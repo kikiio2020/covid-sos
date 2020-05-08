@@ -113,34 +113,30 @@
     <footer class="footer mt-3 pt-3" style="background-color:#F7F7F7">
     	<div class="container">
     		<div class="row">
-    			<div class="col-4 text-center">
-    				<div class="container">
-        				<div class="row"><div class="col-4 text-center">
-                			<ul>
-                				<li><a href="">ABOUT</a></li>
-                				<li><a href="">CREDITS</a></li>
-                				<li><a href="">GET INVLOVED</a></li>
-                				<li><a href="">RESCOURCES</a></li>
-                				<li><a href="">PRIVACY POLICY</a></li>
-            				</ul>
-                		</div></div>
-    				</div>
+    			<div class="col-md-4 text-center">
+        			<ul class="text-left">
+        				<li><a href="">ABOUT</a></li>
+        				<li><a href="">CREDITS</a></li>
+        				<li><a href="">GET INVLOVED</a></li>
+        				<li><a href="">RESCOURCES</a></li>
+        				<li><a href="">PRIVACY POLICY</a></li>
+    				</ul>
     			</div>
-    			<div class="col-4 text-center">
-    				<div class="container">
-        				<div class="row"><div class="col-4 text-center">
-        					
-        				</div></div>
-    				</div>
+    			<div class="col-md-4 text-center">
+    				<ul class="text-left">
+        				<li><a href=""><i class="fab fa-twitter"></i> Twitter</a></li>
+        				<li><a href=""><i class="fab fa-github"></i> Github</a></li>
+        				<li><a href=""><i class="fab fa-patreon"></i> Patreon</a></li>
+    				</ul>
 				</div>
-				<div class="col-4 text-center">
+				<div class="col-md-4 text-right">
     				<div class="container m-auto">
-        				<div class="row"><div class="col-4 text-center">
+        				<div class="row"><div class="col text-right">
         					<div style="font-weight:bold; font-size:xx-large; white-space: nowrap;">
                     			covid-S<span class="text-danger">O</span>S
                 			</div>
         				</div></div>
-        				<div class="row"><div class="col-4 text-center">
+        				<div class="row"><div class="col text-right">
         					We're in this together!
         				</div></div>
     				</div>
@@ -148,8 +144,7 @@
 			</div>
     		<div class="row mb-3"></div>
     		<div class="row" style="border-top: 1px solid #9DAAB5">
-        		<div class="col-6 text-left">&#169;</div>
-        		<div class="col-6 text-right">created by <a href="https://www.kikiio.com">Daniel 'Kikiio' Leung</a> {{ now()->year }}.</div>
+        		<div class="col text-right">&#169; created by <a href="https://www.kikiio.com" target="_blank">Kikiio</a> {{ now()->year }}.</div>
     		</div>
     	</div>
     </footer>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Middleware\UnknownStatus;
+use App\Ask;
 
 class HomeController extends Controller
 {
@@ -52,4 +53,15 @@ class HomeController extends Controller
     {
         return view('shoplist');
     }
+    
+    public function askStandAloneInProgressView(Ask $ask)
+    {
+        return view('standalone.ask', ['ask' => $ask]);
+    }
+    
+    public function askStandAloneHistoryView(Ask $ask)
+    {
+        return view('standalone.ask', ['ask' => $ask]);
+    }
+    
 }

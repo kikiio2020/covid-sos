@@ -1,7 +1,7 @@
 <template>
 <div>
 <b-container>
-    <b-row><b-col class="text-left">
+    <!-- <b-row><b-col class="text-left">
         <b-button
             variant="primary"
             v-b-popover="{
@@ -13,6 +13,7 @@
             @click="sendRequest"
         >Make a Request</b-button>
     </b-col></b-row>
+     -->
     <!--Profile Update-->
     <b-row><b-col>
     <model-view
@@ -32,19 +33,24 @@
                 key: 'name',
                 sortable: true,
             },
-            {
-                key: 'description', 
-                sortable: true,
-            },
             'actions',
         ]"
+        :actions="[
+        	{
+        		text: 'Make Request',
+        		event: 'make_request',
+        		icon: 'chat-square',
+        	},
+        	'edit',
+        	'remove',	
+        ]"
+        v-on:make_request="makeRequest"
         :modal-fields="modalFields"
         api="/webapi/sos"
         gridUrlQuery="/sosView"
-        :insertable="true"
-        :deletable="true"
         modal-size='lg'
         :table-properties="tableProperties"
+        @asyncReturns="actionCompletes"
     >
     </model-view>
     </b-col></b-row>
@@ -61,7 +67,7 @@ export default {
     data() {
         return {
             tableProperties: {
-                    selectable: true,
+                    selectable: false,
                     selectMode: "single",
                     /*vBPopover: {
                         trigger: 'hover',
@@ -133,7 +139,7 @@ export default {
                     name: "Delivery Option",
                     placeholder: "Delivery Option *",
                     id: "delivery_option",
-                    required: true,
+                    //required: true,
                     rules: "required",
                     options: this.deliveryOptions,
                     class: "my-3 mr-3",
@@ -144,7 +150,7 @@ export default {
                     name: "Payment Option",
                     placeholder: "Payment Option *",
                     id: "payment_option",
-                    required: true,
+                    //required: true,
                     rules: "required",
                     options: this.paymentOptions,
                     class: "my-3 mr-3",
@@ -184,7 +190,15 @@ export default {
         }
     },
     methods: {
-        sendRequest: function() {
+        makeRequest: function(sos) {
+        	this.$emit('sosCreatesNewAsk', {
+                sos_id: sos.id
+            });
+        },
+        actionCompletes: function() {
+        	this.$store.commit('endWorkflow');
+        }
+    	/*sendRequest: function() {
             //console.log(this.$refs.myModelView.rowsSelected);
             //this.$refs.asksModelView.insertModel();
 
@@ -197,8 +211,7 @@ export default {
                     sos_id: sosId
                 });
             }
-
-        }
+        }*/
     },
     computed: {
         rowsSelected: function() {

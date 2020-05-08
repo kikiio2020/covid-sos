@@ -16,7 +16,7 @@ class ShoplistItem extends Model
     
     public function sos()
     {
-        return $this->belongsTo(Sos::class, 'sos_id', 'id');
+        return $this->belongsTo(Sos::class, 'sos_id');
     }
     
     public function item()
