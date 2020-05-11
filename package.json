@@ -7,30 +7,39 @@
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "test": "mochapack --webpack-config node_modules/laravel-mix/setup/webpack.config.js --require tests/js/setup.js tests/js/*.spec.js"
     },
     "devDependencies": {
+        "@vue/test-utils": "^1.0.2",
         "axios": "^0.19",
+        "babel": "^6.23.0",
         "bootstrap": "^4.4.1",
+        "chai": "^4.2.0",
         "cross-env": "^7.0",
-        "jquery": "^3.5.0",
+        "jquery": "^3.5.1",
+        "jsdom": "^16.2.2",
+        "jsdom-global": "^3.0.2",
         "laravel-mix": "^5.0.1",
         "lodash": "^4.17.13",
+        "mocha": "^7.1.2",
+        "mochapack": "^2.0.0",
         "popper.js": "^1.12",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.26.5",
         "sass-loader": "^8.0.0",
         "vue": "^2.6.11",
-        "vue-template-compiler": "^2.6.10"
+        "vue-loader": "^15.9.2",
+        "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.13.0",
-        "bootstrap-vue": "^2.13.0",
+        "bootstrap-vue": "^2.13.1",
         "es6-promise": "^4.2.8",
         "portal-vue": "^2.1.7",
         "vee-validate": "^3.3.0",
         "vue-axios": "^2.1.5",
         "vue-bootstrap-typeahead": "^0.2.6",
-        "vuex": "^3.3.0"
+        "vuex": "^3.4.0"
     }
 }

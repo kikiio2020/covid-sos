@@ -127,16 +127,6 @@ export default {
         },
     },
     mounted() {
-    	/*axios.get(this.modelApi).then(response => {
-            this.modelExists = true;
-            if (response.data.data[this.id]) {
-                this.imageSrc = this.getModelImageApi();
-            }
-        }).catch(function(){
-        });*/
-        /*this.vModel.forEach(function(item){
-            console.log(item);
-        });*/
     }
 }
 </script>

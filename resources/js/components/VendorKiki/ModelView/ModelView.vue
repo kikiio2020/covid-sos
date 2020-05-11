@@ -127,29 +127,6 @@ extend('required', {
     message: "{_field_} is required"
 });
 
-/*
-const actionDropdown = Vue.component('action-dropdown', {
-	render: function (createElement) {
-		//return createElement('b-icon', {attrs:{icon: 'tag'}});
-		return createElement(
-				'b-dropdown', 
-				{
-					attrs: {
-						noCaret: true,
-						variant: 'primary',
-						size: 'sm'
-					}
-				},
-				[
-					createElement('template', {attrs:{'v-slot:button-content': true}},
-						createElement('b-icon-caret-down')		
-					),
-					createElement('b-dropdown-item', 'hello')
-				]
-			);
-	}
-});
-*/
 export default {
     components: {
     	BTable, 
@@ -233,7 +210,6 @@ export default {
         },
         edit(row, button) {
             this.editModalRecord = row.item;
-            //this.setOriginalModalRecord(item);
             this.editModalTitle = 'Edit '+ this.tableName;
             this.editModalNew = false;
             this.editModalReadOnly = false;
@@ -241,7 +217,6 @@ export default {
         },
         setOriginalModalRecord(original) {
             if (!original) {
-                //console.log(this.originalModalRecord);
                 return this.originalModalRecord;
             }
             this.originalModalRecord = { ...original };
@@ -267,7 +242,6 @@ export default {
                         variant: 'success',
                     });
                     this.loadData();
-                    //this.$root.$emit('bv::refresh::table', 'grid-table');
                     this.$emit('recordRemoved', id);
                     this.$emit('asyncReturns', id);
                 }).catch((error) => {
@@ -290,7 +264,6 @@ export default {
         },
         handleClose(){
         	this.$root.$emit('bv::hide::modal', this.id);
-            //this.$root.$emit('bv::refresh::table', 'grid-table');
         },
         handleModalHide() {
         	//triggered by modal hide
@@ -324,12 +297,6 @@ export default {
         },
         handleSubmit() {           
             this.saving=true;
-            /*let formData = new FormData();
-            Object.keys(this.editModalRecord).forEach(key => {
-                if (this.editModalRecord[key]) {
-                    formData.append(key, this.editModalRecord[key]);
-                } 
-            });*/
             var formData = this.editModalRecord;
             if (this.editModalNew) {
             	var verb = 'POST';
@@ -393,7 +360,6 @@ export default {
         loadData() {
             axios.get(this.api + this.gridUrlQuery).then(response => {
                 this.totalRows = response.data.data.length;
-                //this.totalRows = response.data.length;
                 this.tableBusy = false;
                 this.items = response.data.data;
                 this.$root.$emit('bv::refresh::table', 'grid-table');
