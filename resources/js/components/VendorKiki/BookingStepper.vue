@@ -17,7 +17,7 @@
                 title="Previous"
                 :disabled="stepperBtnBackwardDisabled"
             >
-                <b-icon-skip-backward-fill></b-icon-skip-backward-fill>
+                <b-icon-arrow-left></b-icon-arrow-left>
             </b-button>
         </span>
         <b-tooltip target="backBtnWrapper" title="Previous"></b-tooltip>
@@ -31,7 +31,7 @@
                 title="Next"
                 :disabled="stepperBtnForwardDisabled"
             >
-                <b-icon-play-fill></b-icon-play-fill>
+                <b-icon-arrow-right></b-icon-arrow-right>
             </b-button>
         </span>
         <b-tooltip target="nextBtnWrapper" title="Next"></b-tooltip>
@@ -40,11 +40,11 @@
 </template>
 
 <script>
-    import { BButton, BTooltip, BIconSkipBackwardFill, BIconPlayFill, BIconSkipEndFill } from 'bootstrap-vue';
+    import { BButton, BTooltip, BIconArrowRight, BIconArrowLeft } from 'bootstrap-vue';
 
     export default {
         components: {
-            BIconPlayFill, BIconSkipEndFill
+        	BButton, BTooltip, BIconArrowRight, BIconArrowLeft
         },
         props: {
             testProp: {
@@ -120,31 +120,27 @@
         },
         methods: {
             flipForward() {
-                this.stepped.push(this.step);
+            	this.resetNavControls();
+            	this.stepped.push(this.step);
                 if (this.value.nextStep) {
                     this.step = this.value.nextStep;
-                    this.value.nextStep = null;
+                } else {
+                	this.step ++;
                 }
                 this.$emit('flip-forward');
                 if (this.step >= this.getNumSlots()) {
-                    console.log('no more forward');
-                    this.noMoreNext = true;
-                    return;
-                }
-                this.resetNavControls();
-                this.step ++;
-                if (this.step >= this.getNumSlots()) {
                     this.noMoreNext = true;
                 }
+                this.value.nextStep = null;
             },
             flipBackward() {    
-                this.step = this.stepped.pop();
+            	this.resetNavControls();
+            	this.step = this.stepped.pop();
+            	this.$emit('flip-backward');
                 if (this.step <= 1) {
-                    console.log('no more backward');
                     this.noMorePrev = true;
-                    return;
                 }
-                this.resetNavControls();
+                this.value.nextStep = null;
             },
             getNumSlots: function() {
                 return Object.keys(this.$slots).length;
@@ -157,13 +153,10 @@
             },
         },
         beforeCreate() {
-            console.log('before create');
         },
         created() {
-            console.log('BookingStepper created.'); 
         },
         mounted() {
-            console.log('BookingStepper mounted.');
         }
     }
 </script>

@@ -75,9 +75,7 @@ export default {
         onSelect(){
             //If have symptoms go to step 6 (quarantine-when)
             //else go to step 2 (high-risk-yes-no)
-            console.log(this.haveSymptoms);
-            this.$parent.value.nextStep = this.haveSymptoms?5:1;
-            console.log(this.$parent.value.nextStep);
+            this.$parent.value.nextStep = this.haveSymptoms?6:2;
             this.$parent.okNext = null !== this.haveSymptoms;  
             window.scrollTo({ top:document.body.scrollHeight, behavior: 'smooth', });
         }

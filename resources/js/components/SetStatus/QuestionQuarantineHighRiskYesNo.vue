@@ -104,9 +104,7 @@ export default {
         onSelect(){
             //If in High Risk go to step 5 (conclusion-high-risk)
             //else go to step 3 (can-help-yes-no)
-            console.log(this.isHighRisk);
-            this.$parent.value.nextStep = this.isHighRisk?4:2;
-            console.log(this.$parent.value.nextStep);
+            this.$parent.value.nextStep = this.isHighRisk?5:3;
             this.$parent.okNext = null !== this.isHighRisk;       
             window.scrollTo({ top:document.body.scrollHeight, behavior: 'smooth', });    
         }

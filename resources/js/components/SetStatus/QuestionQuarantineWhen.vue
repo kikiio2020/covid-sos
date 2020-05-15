@@ -59,7 +59,7 @@ export default {
     computed: {},
     mounted() {
         //Must go to step 7 (conclusion-quarantine)
-        this.$parent.value.nextStep = 6;
+        this.$parent.value.nextStep = 7;
         this.$parent.okNext = false;       
     }
 }

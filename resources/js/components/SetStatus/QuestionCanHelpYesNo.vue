@@ -46,9 +46,7 @@ export default {
         onSelect(){
             //If Can Help go to step 4 (conclusion-can-help)
             //else go to step 8 (conclusion-unknown)
-            console.log(this.canHelp);
-            this.$parent.value.nextStep = this.canHelp?3:7;
-            console.log(this.$parent.value.nextStep);
+            this.$parent.value.nextStep = this.canHelp?4:8;
             this.$parent.okNext = null !== this.isHighRisk;       
             window.scrollTo({ top:document.body.scrollHeight, behavior: 'smooth', });    
         }
