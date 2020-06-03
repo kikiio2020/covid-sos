@@ -2,7 +2,7 @@
     <b-container><b-row>
     <b-col></b-col>
     <b-col sm=8>
-        <booking-stepper num-steps="8" v-model="steps">
+        <flipping-stepper num-steps="8" v-model="steps">
             <template v-slot:1>
                 <question-have-symptoms></question-have-symptoms>
             </template>
@@ -27,14 +27,16 @@
             <template v-slot:8>
                 <conclusion-unknown></conclusion-unknown>
             </template>                        		
-        </booking-stepper>
+        </flipping-stepper>
     </b-col>
     <b-col></b-col>
     </b-row></b-container>
 </template>
 <script>
+import FlippingStepper from '@kikiio2020/vue-flipping-stepper';
+
 export default {
-    components: {},
+    components: {FlippingStepper},
     props: [],
     data() {
         return {

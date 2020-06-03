@@ -2,7 +2,7 @@
     <b-container>
         <b-row><b-col>
             <strong>{{placeHolder}}:</strong>
-            <model-view
+            <crud-control
                 id="shoplist-item-view"
                 ref="shoplistItemView"
                 table-name=""
@@ -37,7 +37,7 @@
                 :searchable="false"
                 :insertable="false"
             >
-            </model-view>
+            </crud-control>
         </b-col></b-row>
         <b-row><b-col class="text-center">
             <b-button 
@@ -48,8 +48,10 @@
     </b-container>
 </template>
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
         'name',
         'id',

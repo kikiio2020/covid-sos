@@ -1,5 +1,5 @@
 <template>
-    <model-view
+    <crud-control
         id="asks-pending-model-view"
         ref="myModelView"
         table-name=""
@@ -29,15 +29,17 @@
         api="/webapi/ask"
         gridUrlQuery="/pendingsView"
         :insertable="!isResponder"
-        @modalClose="actionCancel"
-        @asyncReturns="actionCompletes"
+        @modal-close="actionCancel"
+        @async-returns="actionCompletes"
     >
-    </model-view>
+    </crud-control>
 </template>
 
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
         'isResponder',
         'sosOptions',

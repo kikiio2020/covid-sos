@@ -124,11 +124,24 @@ class UserController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function removeCache(Request $request): Response
+    public function updateHomeTabIndexCache(Request $request): Response
     {
         \Validator::make($request->all(), [
-            'cache' => 'string',
+            'index'=> 'required',
         ])->validate();
-        Cache::forget($request->cache);
+        auth()->user()->putHomeTabIndexCache($request->index);
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function flushCache(Request $request): Response
+    {
+        Cache::flush();
+        
+        return response('', Response::HTTP_OK);
     }
 }

@@ -3,12 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Ask;
 
-class RequestCompleted extends Notification
+class RequestNeedsApproval extends Notification
 {
     use Queueable;
 
@@ -45,26 +44,30 @@ class RequestCompleted extends Notification
     {
         $isResponder = $notifiable->id === $this->ask->responded_by;
         
-        $line = $isResponder ? 
-            'Thank you being awesome! This is to confirm the request ' . 
-            '<' . $this->ask->sos->name . '> for ' .
-            $this->ask->user->getUserName() . 
-            ' is now completed.'
-            : 
-            'This is to confirm your request "' . 
-            '<' . $this->ask->sos->name . '> ' . 
-            '" is now completed.';
+        if ($isResponder) {
+            $line1 = $this->ask->user->getUserName() . ' ' .
+                'has indicated the work for their request ' .
+                '<' . $this->ask->sos->name . '> is now completed. Thanks!';
+            $line2 = 'Please confirm and close the request by following the link below' .
+                'to the request and click the \'Complete\' button.';
+        } else {
+            $line1 = 'Good news! ' . $this->ask->responder->getUserName() . ' ' .
+                'has now completed the work for your request ' .
+                '<' . $this->ask->sos->name . '> ';
+            $line2 = 'Please follow the link below to the request and click the ' .
+                '\'Complete\' button to confirm and close the request.';
+        }
         
-        $subject = config('mail.subjectPrefix') . 'Request <' . $this->ask->sos->name . '> Compeleted';
+        $subject = config('mail.subjectPrefix') . 'Re: Request <' . $this->ask->sos->name . '>';
         
-        $url = url('ask/' . $this->ask->id . '/history/');
+        $url = url('ask/' . $this->ask->id . '/inProgress/');
         
         //framework/src/Illuminate/Notifications/resources/views/email.blade.php
         return (new MailMessage)
             ->subject($subject)
             ->greeting('Hi ' . $notifiable->getUserName())
-            ->line($line)
-            ->line('For you reference, you can click the button below to access the request. It will remain there for next month.')
+            ->line($line1)
+            ->line($line2)
             ->action($this->ask->sos->name, $url)
             ->line('Thank you for being part of our community!')
             ->line("Sincerely,")

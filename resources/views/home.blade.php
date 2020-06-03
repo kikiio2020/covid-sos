@@ -21,15 +21,8 @@
         		user-id="{{ auth()->user()->id }}"
         		user-name="{{ auth()->user()->getUserName() }}"
         		:sos-options="{{ json_encode($sosOptions) }}"
+				:current-tab-index="{{ auth()->user()->getHomeTabIndexCache() }}"        		
         	></home>
-        
-    		
-            <!-- <div class="card">
-                <div class="card-header">Dashboard</div>
-                <div class="card-body">
-            
-                </div>
-            </div> -->
         </div>
     </div>
 </div>

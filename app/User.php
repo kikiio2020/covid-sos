@@ -5,16 +5,18 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Cache;
-use App\Http\Resources\SosCollection;
 use Illuminate\Support\Collection;
+use App\Traits\ModelCacheTrait;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable;
+    use Notifiable, ModelCacheTrait;
 
-    public const CACHE_TIME = 86400; //24 hours
+    public const NEARBY_CACHE_DURATION = 86400; //24 hours
     public const CACHE_KEY_NEARBY = 'nearby';
+    
+    public const HOME_TAB_INDEX_DURATION = 604800; //one week
+    public const CACHE_KEY_HOME_TAB_INDEX = 'hometabindex';
     
     public const STATUS_UNKNOWN = 0;
     public const STATUS_RESPONDER = 1;
@@ -70,21 +72,28 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Sos::class, 'created_by');
     }
     
-    public static function getNearbyCacheKey(int $userId): string
+    public function getHomeTabIndexCache()
     {
-        return self::CACHE_KEY_NEARBY . '_' . $userId;
+        return $this->getCache(self::CACHE_KEY_HOME_TAB_INDEX, 0);
+    }
+    
+    public function putHomeTabIndexCache($index)
+    {
+        return $this->putCache(self::CACHE_KEY_HOME_TAB_INDEX, $index, self::HOME_TAB_INDEX_DURATION);
     }
     
     public function getNearbyCache(): ?Collection 
     {
         return unserialize(
-                Cache::get($this->getNearbyCacheKey($this->id))
-            ) ?: null;
+            $this->getCache(self::CACHE_KEY_NEARBY)
+        ) ?: null;
     }
     
-    public function putNearbyCache(Collection $sosCollection, int $seconds = null): bool 
+    public function putNearbyCache(Collection $sosCollection): bool 
     {
-        return Cache::put($this->getNearbyCacheKey($this->id), serialize($sosCollection), $seconds);
+        return $this->putCache(
+            self::CACHE_KEY_NEARBY, serialize($sosCollection), self::NEARBY_CACHE_DURATION
+        );
     }
     
     public function clearNearbyCache(): bool
@@ -94,12 +103,13 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public static function clearNearbyCacheById(int $userId): bool
     {
-        return Cache::forget(self::getNearbyCacheKey($userId));
+        return self::forgetCacheById(self::CACHE_KEY_NEARBY, $userId);
     }
     
     public function getNearbyResult($limit = 10): Collection
     {
         $result = $this->getNearbyCache();
+        
         if ($result) {
             return $result;
         }
@@ -113,8 +123,34 @@ class User extends Authenticatable implements MustVerifyEmail
         })
         ->leftJoin('sos', 'sos.id', '=', 'asks.sos_id')
         ->select([
-            'asks.*',
-            'sos.*',
+            'asks.id',
+            'asks.user_id',
+            'asks.sos_id',
+            'asks.needed_by',
+            'asks.special_instruction',
+            'asks.status',
+            'asks.responded_by',
+            'asks.chat',
+            'asks.receipt_image',
+            'asks.user_approved',
+            'asks.responder_approved',
+            'asks.deleted_at',
+            'asks.created_at',
+            'asks.updated_at',
+            
+            'sos.name',
+            'sos.description',
+            'sos.vendor_name',
+            'sos.vendor_address',
+            'sos.compensation',
+            'sos.delivery_option',
+            'sos.payment_option',
+            'sos.other_instruction',
+            'sos.created_by',
+            'sos.deleted_at',
+            'sos.created_at',
+            'sos.updated_at',
+            
             'creator.email as creator.email',
             'creator.name as creator.name',
             'creator.address as creator.address',
@@ -138,7 +174,8 @@ class User extends Authenticatable implements MustVerifyEmail
         ->limit($limit);
                 
         $result = $asksQuery->get();
-        $this->putNearbyCache($result, self::CACHE_TIME);
+        
+        $this->putNearbyCache($result);
         $this->putNearbyReverseCache($result);
         
         return $result;
@@ -147,7 +184,7 @@ class User extends Authenticatable implements MustVerifyEmail
     private function putNearbyReverseCache(Collection $nearbyResult)
     {
         $nearbyResult->each(function($item) {
-            Ask::putNearbyReverseCacheById($item->id, $this->id, self::CACHE_TIME);
+            Ask::putNearbyReverseCacheById($item->id, $this->id);
         });
     }
     

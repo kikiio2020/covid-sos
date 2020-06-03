@@ -31,7 +31,8 @@
 					<div class="ml-5">${{ $ask->sos->complensation }}</div>
 				</div>
 				@endisset
-				
+
+				@if($ask->sos->shoplistItem()->count())				
 				<div class="d-flex flex-column justify-content-left mt-3">
 						<b-button v-b-toggle.shoplist variant="primary">Shop list</b-button>					
 						<b-collapse id="shoplist" class="mt-2">
@@ -41,7 +42,6 @@
                             	value="@json($ask->sos->shoplistItem())"
                             ></shoplist-items-read-field>
                              -->
-                            
                             <b-list-group
                             	style="max-height: 300px; margin-bottom: 10px; overflow:scroll; -webkit-overflow-scrolling: touch;"
                             >
@@ -65,9 +65,9 @@
                                 </b-list-group-item>
 								@endforeach
 							</b-list-group>
-
                           </b-collapse>
 				</div>
+				@endif
 				
 				@isset($ask->special_instruction)
 				<div class="d-flex justify-content-left">
@@ -95,24 +95,16 @@
     				</div>
 				</b-card>
 				
-				<div class="d-flex flex-column mt-5 justify-content-center">
-					<div class="">
-    					<model-chat-field
-    						id="chat"
-							name="Chat"
-							user-name="{{auth()->user()->getUserName()}}"
-							caption="Communication"
-							placeholder="Communication"
-    						api="/webapi/ask"
-    						value="{{ $ask->chat }}"
-    						:model-id="1"
-    						readonly="{{\App\Ask::STATUS_COMPLETED === $ask->status}}"
-    					></model-chat-field>
-					</div>
+				<div class="d-flex flex-column mt-5 mb-5 justify-content-center">
+					Communication Log:
+					<chat-log chat="{{ $ask->chat }}"></chat-log>
 				</div>
 				
 				<div class="d-flex justify-content-end">
 					<div class="">
+						@if( $isInProgress )
+							<button-complete ask-id="{{ $ask->id }}"></button-complete>
+						@endif
 						<b-button @click="this.window.location = '/'">Close</b-button>
 					</div>
 				</div>

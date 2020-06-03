@@ -1,8 +1,21 @@
 <template>
-    <div>
-        <strong>{{placeholder}}:</strong>
+	<div>
+	<b-modal 
+		:id="id" 
+		title="Chat" 
+		ok-title="Send" 
+		@ok="submitChat"
+		:lazy="true"
+		@change="modalToShow"
+	><div>
+        <strong>Communication:</strong>
+        
         <b-container>
             <b-row><b-col>
+                <chat-log
+                	:chat="JSON.stringify(chat)"
+                ></chat-log>
+                <!-- 
                 <div 
                     style="overflow-y: scroll; height:7em;"
                     id="chatList"
@@ -10,9 +23,10 @@
                     class="border border-secondary"
                     v-html="formatedChat()"
                 ></div>
+                -->
             </b-col></b-row>
             <b-row v-if="!readonly"><b-col >
-                <ValidationProvider :name="caption" rules="max:60" v-slot="validationContext">
+                <ValidationProvider name="Message" rules="max:60" v-slot="validationContext">
                     <b-form-textarea
                         id="inputBox"
                         rows="2"
@@ -22,6 +36,7 @@
                         placeholder="Enter Message"
                     ></b-form-textarea>
                     <b-form-invalid-feedback id="feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                    <!-- 
                     <b-button
                         size="sm"
                         style="width:6em"
@@ -32,10 +47,14 @@
                     >
                         <b-icon-chat></b-icon-chat>
                     </b-button>
+                     -->
                 </ValidationProvider>
             </b-col></b-row>
         </b-container>
-    </div>
+        
+	    </div>
+	</b-modal>
+	</div>
 </template>
 <script>
 import { BSpinner, BIcon, BButton, BFormFile } from 'bootstrap-vue';
@@ -54,23 +73,25 @@ export default {
     components: {ValidationProvider, ValidationObserver},
     props: {
         id: String,
-        name: String, 
+        //name: String, 
         userName: String,
-        caption: String, 
-        placeholder: String, 
+        //caption: String, 
+        //placeholder: String, 
         disabled: {
-            default: false
+            default: false,
         }, 
         api: String,
-        value: {},
+        /*value: {
+        	default: () => '[]',
+        },*/
         modelId: Number,
         readonly: false,
     },
     data() {
         return {
-            chatList: '',
+            chat: [],
+        	chatList: '',
             chatInput: '',
-            vModel: JSON.parse(this.value)
         }
     },
     methods: { 
@@ -84,7 +105,7 @@ export default {
         },
         submitChat() {
             const now = new Date();
-            this.vModel.push({
+            this.chat.push({
                 user: this.userName,
                 isNew: true,
                 date: now,
@@ -92,7 +113,7 @@ export default {
             });
             axios.put(this.modelApi, {
                 id: this.modelId,
-                chat: JSON.stringify(this.vModel)
+                chat: JSON.stringify(this.chat)
             }).then(response => {
                 this.chatInput = '';
             }).catch(error => {
@@ -104,7 +125,7 @@ export default {
         },
         formatedChat() {
             var chatLogFormated = '';
-            this.vModel.forEach((item) => {
+            this.chat.forEach((item) => {
                 var chatFormated = 
                     '<small>' + item.user
                     + ' &lt; <span class="font-italic">' 
@@ -119,6 +140,12 @@ export default {
             chatLogFormated = chatLogFormated ? chatLogFormated : '<small class="text-muted">This is start of your conversation...</small>';
             
             return chatLogFormated;
+        },
+        modalToShow() {
+        	axios.get(this.modelApi)
+        		.then(response => {
+        			this.chat = JSON.parse(response.data.data.chat);
+        		})
         }
     },
     computed: {

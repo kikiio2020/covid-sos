@@ -1,7 +1,7 @@
 <template>
 <b-container>
     <b-row><b-col class="text-left">
-        <model-view
+        <crud-control
             id="nearby-model-view"
             ref="myModelView"
             table-name=""
@@ -34,7 +34,7 @@
             :actions="[
 	        	'details',
 	        	{
-	        		text: 'Pledge',
+	        		label: 'Pledge',
 	        		event: 'pledgeRequest',
 	        		fontawesome: 'fas fa-hands-helping',
 	        	},
@@ -46,14 +46,16 @@
             :table-properties="tableProperties"
 			@pledgeRequest="pledgeRequest"            
         >
-        </model-view>
+        </crud-control>
     </b-col></b-row>
 </b-container>
 </template>
 
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
         'isResponder',
         'deliveryOptions', 
@@ -92,18 +94,6 @@ export default {
                     id: "needed_by",
                     
                 },
-                /*{
-                    fieldType: "model-read-only-field",
-                    placeholder: "Vendor",
-                    name: "vendor_name",
-                    id: "vendor_name"
-                },
-                {
-                    fieldType: "model-gmap-link-field",
-                    placeholder: "Vendor Address",
-                    name: "vendor_address",
-                    id: "vendor_address"
-                },*/
                 {
                     fieldType: "model-read-only-field",
                     placeholder: "Delivery Option",
@@ -144,7 +134,7 @@ export default {
             ).then(confirm => {
                 if (confirm) {
                     axios.put(
-                        '/webapi/ask/pledgeRequest' + request.id
+                        '/webapi/ask/pledgeRequest/' + request.id
                         /*, 
                         {
                             id: request.id,
@@ -187,20 +177,6 @@ export default {
             }).catch(err => {
                 // An error occurred
             })
-            
-            
-            //console.log(this.$refs.myModelView.rowsSelected);
-        
-            //this.$emit('nearbyNewpledge');
-            /*if (
-                this.$refs.myModelView.rowsSelected 
-                && this.$refs.myModelView.rowsSelected.length 
-            ) {
-                const id = this.$refs.myModelView.rowsSelected[0].id;
-                this.$emit('nearbyNewpledge', {
-                    id: id
-                });
-            }*/
         },
     },
     computed: {

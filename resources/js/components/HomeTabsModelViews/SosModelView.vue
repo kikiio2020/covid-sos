@@ -16,7 +16,7 @@
      -->
     <!--Profile Update-->
     <b-row><b-col>
-    <model-view
+    <crud-control
         id="shoplist-view"
         ref="myModelView"
         table-name=""
@@ -37,7 +37,7 @@
         ]"
         :actions="[
         	{
-        		text: 'Make Request',
+        		label: 'Make Request',
         		event: 'make_request',
         		icon: 'chat-square',
         	},
@@ -50,16 +50,18 @@
         gridUrlQuery="/sosView"
         modal-size='lg'
         :table-properties="tableProperties"
-        @asyncReturns="actionCompletes"
+        @async-returns="actionCompletes"
     >
-    </model-view>
+    </crud-control>
     </b-col></b-row>
 </b-container>
 </div>
 </template>
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
         'deliveryOptions', 
         'paymentOptions',

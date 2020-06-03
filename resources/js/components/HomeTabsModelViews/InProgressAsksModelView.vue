@@ -1,72 +1,100 @@
 <template>
-    <model-view
-        id="asks-in-progress-model-view"
-        ref="myModelView"
-        table-name=""
-        :initial-values="{ 
-            id: 0, 
-            sos_text: '', 
-            description: '',
-            needed_by: new Date(),
-            vendor_name: '',
-            vendor_address: '',
-            delivery_option: null,
-            payment_option: null,
-            special_instructions: null,
-            chat: null,
-        }"
-        :grid-fields="[
-            {
-                key: 'needed_by',
-                sortable: true,
-            },
-            {
-                key: 'sos_text',
-                label: 'Name', 
-                sortable: true,
-            },
-            {
-            	key: 'responder',
-                sortable: true,
-            },
-            'actions',
-        ]"
-        :actions="[
-        	'details',
-        	{
-        		text: 'Complete',
-        		event: 'completeRequest',
-        		icon: 'check',
-        	},
-        	{
-        		text: 'Cancel',
-        		event: 'cancelRequest',
-        		icon: 'x',
-        	},
-       	]"
-       	:buttons="[
-       		{
-       			id:'1',
-       			variant: 'primary',
-                content: 'Full View',
-                event: 'openFullView'
-       		}
-       	]"
-        :modal-fields="modalFields"
-        api="/webapi/ask"
-        gridUrlQuery="/inProgressView"
-        :insertable="false"
-        :user-name="userName"
-        @completeRequest="completeRequest"
-        @cancelRequest="cancelRequest"
-        @openFullView="openFullView"
-    >
-    </model-view>
+    <div>
+	    <crud-control
+	        id="asks-in-progress-model-view"
+	        ref="myModelView"
+	        table-name=""
+	        :initial-values="{ 
+	            id: 0, 
+	            sos_text: '', 
+	            description: '',
+	            needed_by: new Date(),
+	            vendor_name: '',
+	            vendor_address: '',
+	            delivery_option: null,
+	            payment_option: null,
+	            special_instructions: null,
+	            chat: null,
+	        }"
+	        :grid-fields="[
+	            {
+	                key: 'needed_by',
+	                sortable: true,
+	            },
+	            {
+	                key: 'sos_text',
+	                label: 'Name', 
+	                sortable: true,
+	            },
+	            {
+	            	key: 'responder',
+	                sortable: true,
+	            },
+	            'actions',
+	        ]"
+	        :actions="[
+	        	'details',
+	        	{
+	        		label: 'Chat',
+	        		event: 'chatRequest',
+	        		icon: 'chat-dots',
+	        	},
+	        	{
+	        		label: 'Complete',
+	        		event: 'completeRequest',
+	        		icon: 'check',
+	        		disabled(row) {
+	        			const data = row.item;
+	        			
+	        			return (
+		        				userId == data.responded_by 
+		        				&& null !== data.responder_approved 
+	        				) ||
+	        				(
+	        					userId == data.user_id 
+		        				&& null !== data.user_approved
+	        				)
+        			}, 
+	        	},
+	        	{
+	        		label: 'Cancel',
+	        		event: 'cancelRequest',
+	        		icon: 'x',
+	        	},
+	       	]"
+	       	:buttons="[
+	       		{
+	       			id:'1',
+	       			variant: 'primary',
+	                content: 'Full View',
+	                event: 'openFullView'
+	       		}
+	       	]"
+	        :modal-fields="modalFields"
+	        api="/webapi/ask"
+	        gridUrlQuery="/inProgressView"
+	        :insertable="false"
+	        @chatRequest="chatRequest"
+	        @completeRequest="completeRequest"
+	        @cancelRequest="cancelRequest"
+	        @openFullView="openFullView"
+	    >
+	    	<!-- :user-name="userName" -->
+	    </crud-control>
+    	<chat
+    		id="chatBox"
+    		:user-name="userName"
+    		api="/webapi/ask"
+    		:model-id="currentAskForChat.id"
+    	></chat>
+  	</div>
 </template>
 
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
         'isResponder',
         'deliveryOptions', 
@@ -126,22 +154,22 @@ export default {
                     name: "special_instructions",
                     id: "special_instructions"
                 },
-                {
-                    fieldType: "model-chat-field",
-                    placeholder: "Communication",
-                    caption: "Message",
-                    name: "chat",
-                    id: "chat",
-                },
             ],
+            currentAskForChat: {
+           		chat: '[]'
+            },
         }
     },
     methods: {
         insertModel(target) {
             this.$refs.myModelView.insertModel(target);
         },
+        chatRequest(row) {
+        	this.currentAskForChat = row;
+        	this.$bvModal.show('chatBox');
+        },
         completeRequest(row) {
-        	const isResponder = this.userId === row.responded_by;
+        	const isResponder = this.userId == row.responded_by;
         	const confirmMsg = isResponder ? 
         			'Please confirm request from ' + row.requester + ' is completed: ' :
        				'Please confirm your request ' + row.sos_text + ' is completed: ';
@@ -152,9 +180,10 @@ export default {
             			.then((response) => {
             				this.$bvModal.msgBoxOk(
            						isResponder ? 
-           							'Thank you so much for helping out! We appreciate you being our community! Once the requestor has also signed off this request will be moved to the History tab and will remain accessible for one month. Thank you!':
-          							'Thank you for confirming! We will notify your helper and will move this task to the History tab and will remain accessible for one month. Thank you!'
+           							'Thank you so much for helping out! We appreciate you being our community! Once the requestor has also signed off this request will be moved to the History tab. It will remain accessible there for one month. Thank you!':
+          							'Thank you for confirming! We will notify your helper and will move this task to the History tab once everyone has approved. It will remain there for one month. Thank you!'
          					);
+            				this.$refs.myModelView.loadData();
             			}).catch((error) => {
             				console.log(error);
             				this.$bvModal.msgBoxOk('Update failed. Please try again later.');

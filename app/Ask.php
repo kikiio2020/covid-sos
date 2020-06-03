@@ -4,10 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
+use App\Traits\ModelCacheTrait;
 
 class Ask extends Model 
 {
+    use ModelCacheTrait;
+    
     public const STATUS_PENDING = 0;
     public const STATUS_IN_PROGRESS = 1;
     public const STATUS_COMPLETED = 2;
@@ -74,11 +76,6 @@ class Ask extends Model
         return $query->where('status', self::STATUS_COMPLETED);
     }
     
-    public static function getNearbyReverseCacheKey(int $askId): string
-    {
-        return self::CACHE_KEY_NEARBY_REVERSE . '_' . $askId;
-    }
-    
     public function getNearbyReverseCache()
     {
         return self::getNearbyReverseCacheById($this->id);
@@ -87,7 +84,7 @@ class Ask extends Model
     public static function getNearbyReverseCacheById(int $askId)
     {
         return unserialize(
-            Cache::get(self::getNearbyReverseCacheKey($askId))
+            self::getCacheById(self::CACHE_KEY_NEARBY_REVERSE, $askId)
         ) ?: [];
     }
     
@@ -96,16 +93,21 @@ class Ask extends Model
         return self::putNearbyReverseCacheById($this->id, $user->id, $seconds);
     }
     
-    public static function putNearbyReverseCacheById(int $askId, int $userId, int $seconds)
+    public static function putNearbyReverseCacheById(int $askId, int $userId, int $seconds = null)
     {
         $cachedValue = self::getNearbyReverseCacheById($askId);
         $cachedValue[$userId] = $userId;
-        
-        return Cache::put(self::getNearbyReverseCacheKey($askId), serialize($cachedValue), $seconds);
+
+        return self::putCacheById(
+            self::CACHE_KEY_NEARBY_REVERSE, 
+            $askId, 
+            serialize($cachedValue), 
+            $seconds
+        );
     }
     
     public function clearNearbyReverseCache(User $user): bool
     {
-        return Cache::forget($this->getNearbyReverseCacheKey($this->id), $user->id);
+        return $this->forgetCache(self::CACHE_KEY_NEARBY_REVERSE);
     }
 }

@@ -15,6 +15,7 @@ use App\Notifications\RequestCompleted;
 use App\Notifications\RequestPledged;
 use App\Http\Resources\HistoryView;
 use Illuminate\Database\Eloquent\Builder;
+use App\Notifications\RequestNeedsApproval;
 
 class AskController extends Controller
 {
@@ -156,10 +157,10 @@ class AskController extends Controller
                     return $item;
                 },
                 $chat
-                ),
-                0,
-                100
-                );
+            ),
+            0,
+            100
+        );
     }
     
     /**
@@ -173,26 +174,22 @@ class AskController extends Controller
         
         DB::transaction(function() use ($askId, $userId) {
             $ask = DB::table('asks')->where('id', '=', $askId)->sharedLock()->first();
-            
             $values = [];
             $now = Carbon::now();
             
-            //Responder completes
             if ($userId === $ask->responded_by) {
+                //Responder
                 $values['responder_approved'] = $now;
                 if ($ask->user_approved) {
                     $values['status'] = Ask::STATUS_COMPLETED;
                 }
-            }
-            
-            //User completes
-            if ($userId === $ask->user_id) {
+            } else {
+                //Requester
                 $values['user_approved'] = $now;
                 if ($ask->responder_approved) {
                     $values['status'] = Ask::STATUS_COMPLETED;
                 }
             }
-            
             if (count($values)) {
                 DB::table('asks')->where('id', '=', $askId)->update($values);
             }
@@ -200,9 +197,21 @@ class AskController extends Controller
         }, 5);
      
         $ask = Ask::find($askId);
-        $user->notify(new RequestCompleted($ask));
-        $ask->responder->notify(new RequestCompleted($ask));
+        if (Ask::STATUS_COMPLETED === $ask->status) {
+            $user->notify(new RequestCompleted($ask));
+            $ask->responder->notify(new RequestCompleted($ask));
+            
+            return response('', Response::HTTP_OK);
+        } 
         
+        if ($userId === $ask->responded_by) {
+            //Responder
+            $ask->user->notify(new RequestNeedsApproval($ask));
+        } else {
+            //Requestor
+            $ask->responder->notify(new RequestNeedsApproval($ask));
+        }
+            
         return response('', Response::HTTP_OK);
     }
     
@@ -232,6 +241,7 @@ class AskController extends Controller
         
         $ask = Ask::find($askId);
         $ask->user->notify(new RequestPledged($ask));
+        $this->clearNearbyCache($ask);
         
         return response('', Response::HTTP_OK);
     }

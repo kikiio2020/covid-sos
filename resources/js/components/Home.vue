@@ -9,7 +9,7 @@
         <b-col>
             <b-tabs content-class="mt-3" v-model="currentHomeTabIndex">
                 <!-- :active="isResponder" :disabled="!isResponder"  -->
-                <b-tab title="Nearby Needs!" :active="isResponder" :disabled="!isResponder" lazy ref="nearbyAsksView">
+                <b-tab title="Nearby Needs!" lazy ref="nearbyAsksView">
                     <nearby-asks-model-view
                         :is-responder="isResponder"
                         :user-id="userId"
@@ -28,7 +28,7 @@
                     ></in-progress-asks-model-view>
                 </b-tab>
                 <!-- :active="!isResponder" -->
-                <b-tab title="Pendings" :active="!isResponder" lazy ref="pendingAsksView">
+                <b-tab title="Pendings" lazy ref="pendingAsksView">
                     <pending-asks-model-view
                         :is-responder="isResponder"
                         :sos-options="sosOptions"
@@ -77,11 +77,11 @@ export default {
         'paymentOptions',
         'userId',
         'userName',
-        'sosOptions'
+        'sosOptions',
+        'currentTabIndex'
     ],
     data() {
-        return {
-        }
+        return {}
     },
     methods: {
         /*
@@ -101,14 +101,14 @@ export default {
             this.$bvModal.hide('confirm-create-sos-modal');
         },
         */
-        newAsk: function(data) {
+        newAsk: function (data) {
             this.$store.commit('startWorkflow', 'sosCreateNewAsk');
         	//this.$refs.pendingAsksView.activate(function(){});
             this.$nextTick(function () {
                 this.$refs.pendingAsksModelView.insertModel({}, data);
             })
         },
-        newPledged:function() {
+        newPledged:function () {
         	//this.$store.commit('startWorkflow', 'nearbyCreateNewPledge');
         	//this.$refs.inProgressAsksView.activate(function(){});
         	this.$store.commit('setHomeTabIndex', homeTabIndex.inProgress);
@@ -116,7 +116,6 @@ export default {
         /*inProgressAsksModalClose:function() {
         	console.log('inProgressAsksModalClose');	
         },*/
-        
     },
     computed: {
     	currentHomeTabIndex: {
@@ -129,7 +128,7 @@ export default {
     	}
     },
     mounted() {
-    	
-    },
+    	this.currentHomeTabIndex = this.currentTabIndex;
+    }
 }
 </script>

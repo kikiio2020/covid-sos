@@ -1,5 +1,5 @@
 <template>
-    <model-view
+    <crud-control
        	id="asks-history-model-view"
         ref="myModelView"
         table-name=""
@@ -55,12 +55,14 @@
         :insertable="false"
         @openFullView="openFullView"
     >
-    </model-view>
+    </crud-control>
 </template>
 
 <script>
+import CrudControl from '@kikiio2020/vue-crud-control';
+
 export default {
-    components: {},
+    components: {CrudControl},
     props: [
     ],
     data() {
@@ -94,8 +96,9 @@ export default {
                 {
                     fieldType: "model-read-only-field",
                     placeholder: "Signed off by requester",
-                    name: "requester_approved",
-                    id: "requester_approved",
+                    name: "user_approved",
+                    id: "user_approved",
+                    label: "Requestor Approved",
                     
                 },
                 {
@@ -121,14 +124,6 @@ export default {
                     placeholder: "Special Instructions",
                     name: "special_instructions",
                     id: "special_instructions"
-                },
-                {
-                    fieldType: "model-chat-field",
-                    placeholder: "Communication",
-                    caption: "Message",
-                    name: "chat",
-                    id: "chat",
-                    readonly: true,
                 },
             ],
         }

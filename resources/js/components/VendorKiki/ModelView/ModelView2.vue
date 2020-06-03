@@ -47,6 +47,7 @@
 						@click="rowAction(action, row, $event.target)"
 						:key="row.item.id + index"
 						variant="primary"
+						:disabled="action.disabled && action.disabled(row)"
 					>
 						<div v-if="'edit'==action"><b-icon-pen></b-icon-pen> Edit</div>
                 		<div v-else-if="'details'==action"><b-icon-card-list></b-icon-card-list> Details</div>
@@ -54,7 +55,7 @@
                 		<div v-else>
                 			<b-icon v-if="action.icon" :icon="action.icon"></b-icon> 
                 			<i v-if="action.fontawesome" :class="action.fontawesome"></i>
-                			{{action.text}}
+                			{{action.label}}
                			</div>
 					</b-dropdown-item>
   				</b-dropdown>

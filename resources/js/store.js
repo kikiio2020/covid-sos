@@ -43,13 +43,16 @@ export const store = new Vuex.Store({
 			store.commit('endWorkflow');
 		},
 		setHomeTabIndex: function(state, index) {
-			state.currentHomeTabIndex = index; 
+			state.currentHomeTabIndex = index;
+			store.dispatch('cacheHomeTabIndex', index);
 		},
 	},
 	
 	actions: {
-		myAction(context, data) {
-			//TODO 
+		cacheHomeTabIndex(context, index) {
+			axios.put('/webapi/user/updateHomeTabIndexCache', {
+        		index: index,
+        	});
 		}
 	},
 });

@@ -56,12 +56,18 @@ class HomeController extends Controller
     
     public function askStandAloneInProgressView(Ask $ask)
     {
-        return view('standalone.ask', ['ask' => $ask]);
+        return view('standalone.ask', [
+            'ask' => $ask,
+            'isInProgress' => Ask::STATUS_IN_PROGRESS === $ask->status,
+        ]);
     }
     
     public function askStandAloneHistoryView(Ask $ask)
     {
-        return view('standalone.ask', ['ask' => $ask]);
+        return view('standalone.ask', [
+            'ask' => $ask,
+            'isInProgress' => Ask::STATUS_IN_PROGRESS === $ask->status,
+        ]);
     }
     
 }

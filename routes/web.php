@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Ask;
 use App\Http\Middleware\RequestStatusCanView;
+use Illuminate\Support\Collection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +48,12 @@ use App\Http\Middleware\RequestStatusCanView;
 \Route::put('/webapi/user', 'Api\UserController@update');
 \Route::put('/webapi/user/password', 'Api\UserController@changePassword');
 
-\Route::put('/webapi/user/removeCache', 'Api\UserController@removeCache');
+/**
+ * Cache
+ */
+\Route::put('/webapi/user/updateHomeTabIndexCache', 'Api\UserController@updateHomeTabIndexCache');
+\Route::put('/webapi/user/removeHomeTabIndexCache', 'Api\UserController@removeHomeTabIndexCache');
+\Route::put('/webapi/user/flushCache', 'Api\UserController@flushCache');
 
 //Why this doesn't work???
 /*\Route::ApiResources([
@@ -57,6 +64,32 @@ use App\Http\Middleware\RequestStatusCanView;
  * webapi/ask
  **/
 \Route::get('webapi/ask/inProgressView', 'Api\AskController@inProgressView');
+
+Route::get('webapi/person', function(){
+    $persons = new Collection();
+    $persons->add([
+        'id' => 1,
+        'name' => 'Rachel',
+        'email' => 'rachel@smallthings.in',
+        'phone' => '12312345',
+        'disabledActions' => ['complete'],
+    ]);
+    $persons->add([
+        'id' => 2,
+        'name' => 'Estha',
+        'email' => 'estha@smallthings.in',
+        'phone' => '33334445',
+    ]);
+    
+    $resource = JsonResource::make($persons);
+    
+    
+    return $resource;
+});
+
+
+
+
 \Route::get('webapi/ask/pendingsView', 'Api\AskController@pendingsView');
 \Route::get('webapi/ask/historyView', 'Api\AskController@historyView');
 \Route::get('webapi/ask/nearbyView', 'Api\AskController@nearbyView');
