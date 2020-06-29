@@ -27,6 +27,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 \Route::get('/about', function () {
     return view('about');
 });
+\Route::get('/aboutHujoCoin', function () {
+    return view('abouthujocoin');
+});
 
 /**
  * Behind the wall routes
@@ -125,5 +128,9 @@ Route::get('webapi/person', function(){
     '/webapi/sos/{sos}/shoplistItem' => 'Api\ShoplistItemController',
 ]);
 
-
+//Hujo Coin
+\Route::get('/hujoCoin', 'HomeController@hujoCoin')->name('hujocoin');
+\Route::ApiResources([
+    '/webapi/hujoCoin' => 'Api\HujoCoinController',
+]);
 

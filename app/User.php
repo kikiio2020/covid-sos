@@ -56,6 +56,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->name ?: $this->email;
     }
+
+    public function getLongLat()
+    {
+        return \DB::table($this->table)->selectRaw('ST_Y(longlat) AS longitude, ST_X(longlat) AS latitude')->where('id', $this->id)->first();
+        
+    }
     
     public function ask()
     {
@@ -70,6 +76,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sos()
     {
         return $this->hasMany(Sos::class, 'created_by');
+    }
+    
+    public function hujoCoin(){
+        return $this->hasOne(HujoCoin::class, 'user_id')->withDefault();
     }
     
     public function getHomeTabIndexCache()

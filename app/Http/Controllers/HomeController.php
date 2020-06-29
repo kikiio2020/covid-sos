@@ -54,6 +54,11 @@ class HomeController extends Controller
         return view('shoplist');
     }
     
+    public function hujoCoin()
+    {
+        return view('hujocoin');
+    }
+    
     public function askStandAloneInProgressView(Ask $ask)
     {
         return view('standalone.ask', [

@@ -59,7 +59,7 @@ class UserController extends Controller
     public function update(Request $request): Response
     {
         \Validator::make($request->all(), [
-            'name' => 'nullable|string|max:255',
+            'name' => 'sometimes|string|max:255',
         ])->validate();
         
         $user = auth()->user();

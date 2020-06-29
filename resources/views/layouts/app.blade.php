@@ -12,7 +12,12 @@
 	<link rel="shortcut icon" type="image/png" href="/images/favicon.png">
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    @if (!empty($__env->yieldContent('mainjs')))
+   		@yield('mainjs')
+   	@else
+   		<script src="{{ asset('js/app.js') }}" defer></script>
+	@endif
+    
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">

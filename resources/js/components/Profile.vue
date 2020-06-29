@@ -12,7 +12,7 @@
             <b-container class="col-8 my-3">
                 <b-row>
                     <b-col class="text-right">
-                        <label  for="input-group-1">Name (Optional):</label>
+                        <label  for="input-group-1">Name:</label>
                     </b-col>
                     <b-col class="text-left">
                         <ValidationProvider name="Name" rules="max:255" v-slot="validationContext">
@@ -79,6 +79,7 @@
     </b-col></b-row>
 
     <!--Status Update-->
+    <!-- 
     <b-row><b-col class="col-8">    
         <b-container class="col-8">
             <b-row>
@@ -105,7 +106,22 @@
             </b-row>
         </b-container>
     </b-col></b-row>
-
+ 	-->
+ 
+ 	<!-- Hujo Account -->
+ 	<b-row><b-col class="col-8">    
+        <b-container class="col-8">
+            
+            <b-row>
+                <b-col class="text-right">
+                </b-col>
+                <b-col class="text-left">
+                    <b-button variant="primary" href="/hujoCoin">Hujo Account</b-button>
+                </b-col>
+            </b-row>
+        </b-container>
+    </b-col></b-row>
+ 
     <!--Change Password-->
     <b-row><b-col class="col-8">
         <ValidationObserver ref="formObserver" v-slot="passwordFormContext">

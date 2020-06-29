@@ -25,26 +25,27 @@
         "laravel-mix": "^5.0.1",
         "lodash": "^4.17.13",
         "mocha": "^7.2.0",
-        "mochapack": "^2.0.0",
+        "mochapack": "^2.0.2",
         "popper.js": "^1.12",
         "resolve-url-loader": "^2.3.1",
-        "sass": "^1.26.7",
+        "sass": "^1.26.9",
         "sass-loader": "^8.0.0",
-        "testcafe": "^1.8.6",
+        "testcafe": "^1.8.7",
         "vue": "^2.6.11",
-        "vue-loader": "^15.9.2",
+        "vue-loader": "^15.9.3",
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^5.13.0",
+        "@drizzle/vue-plugin": "^0.1.1",
+        "@fortawesome/fontawesome-free": "^5.13.1",
         "@kikiio2020/vue-crud-control": "0.0.3",
         "@kikiio2020/vue-flipping-stepper": "0.0.21",
         "bootstrap-vue": "^2.15.0",
         "es6-promise": "^4.2.8",
         "portal-vue": "^2.1.7",
-        "vee-validate": "^3.3.1",
+        "vee-validate": "^3.3.6",
         "vue-axios": "^2.1.5",
         "vue-bootstrap-typeahead": "^0.2.6",
-        "vuex": "^3.4.0"
+        "vuex": "^3.5.1"
     }
 }
