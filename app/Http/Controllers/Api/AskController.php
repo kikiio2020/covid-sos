@@ -71,6 +71,7 @@ class AskController extends Controller
                 //TODO Refactor to move to resource
                 $item->distance_km = round($item->distance / 1000, 2);
                 $item->creator = ($item->{'creator.name'} ?: $item->{'creator.email'}) . ' @ ' . $item->{'creator.address'};
+                //TODO add Hujo field
                 
                 return (array) $item;
             }, 

@@ -84,38 +84,15 @@ export default {
         return {}
     },
     methods: {
-        /*
-        onSosClick: function() {
-            if (this.sosOptions.length) {
-                this.$bvModal.show('confirm-create-sos-modal');
-            }
-        },
-        newSos: function() {
-            this.$refs.sosView.activate(function(){});
-            this.$nextTick(function () {
-                this.$refs.sosModelView.insertModel();
-            })
-            this.$bvModal.hide('confirm-create-sos-modal');
-        },
-        existingSos: function(){
-            this.$bvModal.hide('confirm-create-sos-modal');
-        },
-        */
         newAsk: function (data) {
             this.$store.commit('startWorkflow', 'sosCreateNewAsk');
-        	//this.$refs.pendingAsksView.activate(function(){});
-            this.$nextTick(function () {
+        	this.$nextTick(function () {
                 this.$refs.pendingAsksModelView.insertModel({}, data);
             })
         },
         newPledged:function () {
-        	//this.$store.commit('startWorkflow', 'nearbyCreateNewPledge');
-        	//this.$refs.inProgressAsksView.activate(function(){});
         	this.$store.commit('setHomeTabIndex', homeTabIndex.inProgress);
         },
-        /*inProgressAsksModalClose:function() {
-        	console.log('inProgressAsksModalClose');	
-        },*/
     },
     computed: {
     	currentHomeTabIndex: {

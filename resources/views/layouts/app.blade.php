@@ -104,13 +104,8 @@
         
 
     <main class="py-4">
-        @if (cache('show_welcome') && 'about' !== request()->path())
-    		<b-container>
-        		<b-row><b-col>
-        			<welcome-alert></welcome-alert>
-    			</b-col></b-row>
-			</b-container>
-    	@endif
+		<welcome-alert></welcome-alert>
+		<hujo-enrol-invite></hujo-enrol-invite>
         @yield('content')
     </main>
     </div>

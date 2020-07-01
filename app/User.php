@@ -18,6 +18,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public const HOME_TAB_INDEX_DURATION = 604800; //one week
     public const CACHE_KEY_HOME_TAB_INDEX = 'hometabindex';
     
+    public const CACHE_KEY_SHOW_WELCOME = 'show_welcome';
+    public const CACHE_KEY_SHOW_HUJO_INVITE = 'show_hujo_invite';
+    public const ALERT_MESSAGE_DURATION = 1209600; //14 days
+    
     public const STATUS_UNKNOWN = 0;
     public const STATUS_RESPONDER = 1;
     public const STATUS_QUARANTINE = 2;
@@ -51,6 +55,20 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    /**
+     * override
+     * - Add first time alert messages cache
+     */
+    public static function create($data)
+    {
+        /** @var User $user **/
+        $user = self::create($data);
+        $user->putAlertMessageCache(self::CACHE_KEY_SHOW_WELCOME);
+        $user->putAlertMessageCache(self::CACHE_KEY_SHOW_HUJO_INVITE);
+        
+        return $user;
+    }
     
     public function getUserName() 
     {
@@ -126,6 +144,7 @@ class User extends Authenticatable implements MustVerifyEmail
         
         $asksQuery = \DB::table('asks')
         ->leftJoin('users as creator', 'asks.user_id', '=', 'creator.id')
+        ->leftJoin('hujo_coins', 'hujo_coins.user_id', '=', 'creator.id')
         ->join('users as responder', function ($join) {
             $join
             ->on('creator.id', '<>', 'responder.id')
@@ -164,6 +183,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'creator.email as creator.email',
             'creator.name as creator.name',
             'creator.address as creator.address',
+            
+            \DB::raw('if(hujo_coins.id > 0, "Y", "N") as hujo'),            
         ])
         //TODO also calculate delivery distance
         ->selectRaw(
@@ -196,6 +217,23 @@ class User extends Authenticatable implements MustVerifyEmail
         $nearbyResult->each(function($item) {
             Ask::putNearbyReverseCacheById($item->id, $this->id);
         });
+    }
+    
+    public function getAlertMessageCache(string $alert): bool
+    {
+        return $this->getCache($alert, false);
+    }
+    
+    public function putAlertMessageCache(string $alert)
+    {
+        return $this->putCache(
+            $alert, true, self::ALERT_MESSAGE_DURATION
+        );
+    }
+    
+    public function clearAlertMessageCache(string $alert)
+    {
+        return self::forgetCacheById($alert, $this->id);
     }
     
     public function getStatuscaptionAttribute($value)

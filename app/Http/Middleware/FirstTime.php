@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * TODO 
+ * Deprecated. Show Welcome Alert cache is added at the time of new User
+ */
 namespace App\Http\Middleware;
 
 use Closure;

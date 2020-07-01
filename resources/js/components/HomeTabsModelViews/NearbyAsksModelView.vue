@@ -25,6 +25,10 @@
                     sortable: true,
                 },
                 {
+                    key: 'hujo', 
+                    sortable: true,
+                },
+                {
                     key: 'distance_km', 
                     label: 'Distance (KM)',
                     sortable: true,
@@ -92,7 +96,6 @@ export default {
                     placeholder: "Needed By",
                     name: "needed_by",
                     id: "needed_by",
-                    
                 },
                 {
                     fieldType: "model-read-only-field",

@@ -54,9 +54,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Cache
  */
+//\Route::get('/webapi/user/showAlertCache/{alert}', 'Api\UserController@getAlertMessageCache');
+//\Route::put('/webapi/user/showAlertCache/{alert}', 'Api\UserController@putAlertMessageCache');
+//\Route::delete('/webapi/user/showAlertCache/{alert}', 'Api\UserController@clearAlertMessageCache');
+
+\Route::ApiResources([
+    '/webapi/user/showAlertCache' => 'Api\ShowAlertMessageController',
+]);
 \Route::put('/webapi/user/updateHomeTabIndexCache', 'Api\UserController@updateHomeTabIndexCache');
 \Route::put('/webapi/user/removeHomeTabIndexCache', 'Api\UserController@removeHomeTabIndexCache');
 \Route::put('/webapi/user/flushCache', 'Api\UserController@flushCache');
+
 
 //Why this doesn't work???
 /*\Route::ApiResources([
@@ -68,6 +76,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  **/
 \Route::get('webapi/ask/inProgressView', 'Api\AskController@inProgressView');
 
+/*
 Route::get('webapi/person', function(){
     $persons = new Collection();
     $persons->add([
@@ -86,12 +95,9 @@ Route::get('webapi/person', function(){
     
     $resource = JsonResource::make($persons);
     
-    
     return $resource;
 });
-
-
-
+*/
 
 \Route::get('webapi/ask/pendingsView', 'Api\AskController@pendingsView');
 \Route::get('webapi/ask/historyView', 'Api\AskController@historyView');
