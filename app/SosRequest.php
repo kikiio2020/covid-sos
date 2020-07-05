@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Traits\ModelCacheTrait;
 
-class Ask extends Model 
+class SosRequest extends Model 
 {
     use ModelCacheTrait;
     
@@ -81,10 +81,10 @@ class Ask extends Model
         return self::getNearbyReverseCacheById($this->id);
     }
     
-    public static function getNearbyReverseCacheById(int $askId)
+    public static function getNearbyReverseCacheById(int $sosRequestId)
     {
         return unserialize(
-            self::getCacheById(self::CACHE_KEY_NEARBY_REVERSE, $askId)
+            self::getCacheById(self::CACHE_KEY_NEARBY_REVERSE, $sosRequestId)
         ) ?: [];
     }
     
@@ -93,14 +93,14 @@ class Ask extends Model
         return self::putNearbyReverseCacheById($this->id, $user->id, $seconds);
     }
     
-    public static function putNearbyReverseCacheById(int $askId, int $userId, int $seconds = null)
+    public static function putNearbyReverseCacheById(int $sosRequestId, int $userId, int $seconds = null)
     {
-        $cachedValue = self::getNearbyReverseCacheById($askId);
+        $cachedValue = self::getNearbyReverseCacheById($sosRequestId);
         $cachedValue[$userId] = $userId;
 
         return self::putCacheById(
             self::CACHE_KEY_NEARBY_REVERSE, 
-            $askId, 
+            $sosRequestId, 
             serialize($cachedValue), 
             $seconds
         );

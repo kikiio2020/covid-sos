@@ -3,7 +3,6 @@
 	    style="overflow-y: scroll; height:7em;"
 	    id="chatList"
 	    rows="5"
-	    class="border border-secondary"
 	    v-html="formatedChat()"
 	></div>
 </template>
@@ -40,7 +39,7 @@ export default {
                 }
                 chatLogFormated = chatFormated + '<br>' + chatLogFormated;
             });
-            chatLogFormated = chatLogFormated ? chatLogFormated : '<small class="text-muted">This is start of your conversation...</small>';
+            chatLogFormated = chatLogFormated ? chatLogFormated : '<small class="text-muted">There\'s no conversation yet.</small>';
             
             return chatLogFormated;
         },

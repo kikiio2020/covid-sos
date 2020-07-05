@@ -81,14 +81,14 @@ class User extends Authenticatable implements MustVerifyEmail
         
     }
     
-    public function ask()
+    public function sosRequest()
     {
-        return $this->hasMany(Ask::class, 'user_id');
+        return $this->hasMany(SosRequest::class, 'user_id');
     }
 
     public function pledges()
     {
-        return $this->hasMany(Ask::class, 'responded_by');
+        return $this->hasMany(SosRequest::class, 'responded_by');
     }
     
     public function sos()
@@ -142,30 +142,30 @@ class User extends Authenticatable implements MustVerifyEmail
             return $result;
         }
         
-        $asksQuery = \DB::table('asks')
-        ->leftJoin('users as creator', 'asks.user_id', '=', 'creator.id')
+        $sosRequestsQuery = \DB::table('sos_requests')
+        ->leftJoin('users as creator', 'sos_requests.user_id', '=', 'creator.id')
         ->leftJoin('hujo_coins', 'hujo_coins.user_id', '=', 'creator.id')
         ->join('users as responder', function ($join) {
             $join
             ->on('creator.id', '<>', 'responder.id')
             ->where('responder.id' , '=', $this->id);
         })
-        ->leftJoin('sos', 'sos.id', '=', 'asks.sos_id')
+        ->leftJoin('sos', 'sos.id', '=', 'sos_requests.sos_id')
         ->select([
-            'asks.id',
-            'asks.user_id',
-            'asks.sos_id',
-            'asks.needed_by',
-            'asks.special_instruction',
-            'asks.status',
-            'asks.responded_by',
-            'asks.chat',
-            'asks.receipt_image',
-            'asks.user_approved',
-            'asks.responder_approved',
-            'asks.deleted_at',
-            'asks.created_at',
-            'asks.updated_at',
+            'sos_requests.id',
+            'sos_requests.user_id',
+            'sos_requests.sos_id',
+            'sos_requests.needed_by',
+            'sos_requests.special_instruction',
+            'sos_requests.status',
+            'sos_requests.responded_by',
+            'sos_requests.chat',
+            'sos_requests.receipt_image',
+            'sos_requests.user_approved',
+            'sos_requests.responder_approved',
+            'sos_requests.deleted_at',
+            'sos_requests.created_at',
+            'sos_requests.updated_at',
             
             'sos.name',
             'sos.description',
@@ -193,18 +193,18 @@ class User extends Authenticatable implements MustVerifyEmail
                 responder.longlat
             ) AS distance'
         )
-        ->where('asks.status', Ask::STATUS_PENDING)
+        ->where('sos_requests.status', SosRequest::STATUS_PENDING)
         ->whereRaw('
             ST_Distance_Sphere(
                 creator.longlat,
                 responder.longlat
             ) <= 10000'
         )
-        ->orderBy('asks.needed_by') //asc soonest first
-        ->orderBy('asks.created_at') //asc oldest first
+        ->orderBy('sos_requests.needed_by') //asc soonest first
+        ->orderBy('sos_requests.created_at') //asc oldest first
         ->limit($limit);
                 
-        $result = $asksQuery->get();
+        $result = $sosRequestsQuery->get();
         
         $this->putNearbyCache($result);
         $this->putNearbyReverseCache($result);
@@ -215,7 +215,7 @@ class User extends Authenticatable implements MustVerifyEmail
     private function putNearbyReverseCache(Collection $nearbyResult)
     {
         $nearbyResult->each(function($item) {
-            Ask::putNearbyReverseCacheById($item->id, $this->id);
+            SosRequest::putNearbyReverseCacheById($item->id, $this->id);
         });
     }
     

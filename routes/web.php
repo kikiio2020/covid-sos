@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Ask;
 use App\Http\Middleware\RequestStatusCanView;
-use Illuminate\Support\Collection;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\SosRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,12 +36,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 \Route::get('/setstatus', 'HomeController@setstatus')->name('setstatus');
 \Route::get('/profile', 'HomeController@profile')->name('profile');
 \Route::get('/shoplist', 'HomeController@shoplist')->name('shoplist');
-\Route::get('/ask/{ask}/inProgress', 'HomeController@askStandAloneInProgressView')
-    ->middleware(RequestStatusCanView::class . ':' . Ask::STATUS_IN_PROGRESS)    
-    ->name('askStandAloneInProgressView');
-\Route::get('/ask/{ask}/history', 'HomeController@askStandAloneHistoryView')
-->middleware(RequestStatusCanView::class . ':' . Ask::STATUS_COMPLETED)
-    ->name('askStandAloneHistoryView');
+\Route::get('/sosRequest/{sosRequest}/inProgress', 'HomeController@sosRequestStandAloneInProgressView')
+    ->middleware(RequestStatusCanView::class . ':' . SosRequest::STATUS_IN_PROGRESS)    
+    ->name('sosRequestStandAloneInProgressView');
+\Route::get('/sosRequest/{sosRequest}/history', 'HomeController@sosRequestStandAloneHistoryView')
+->middleware(RequestStatusCanView::class . ':' . SosRequest::STATUS_COMPLETED)
+    ->name('sosRequestStandAloneHistoryView');
 
 //\Route::get('/webapi/users/', 'Api\UserController@show');
 \Route::put('/webapi/user/status', 'Api\UserController@updateStatus');
@@ -72,9 +69,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 ]);*/
 
 /**
- * webapi/ask
+ * webapi/sosRequest
  **/
-\Route::get('webapi/ask/inProgressView', 'Api\AskController@inProgressView');
+\Route::get('webapi/sosRequest/inProgressView', 'Api\SosRequestController@inProgressView');
 
 /*
 Route::get('webapi/person', function(){
@@ -99,14 +96,14 @@ Route::get('webapi/person', function(){
 });
 */
 
-\Route::get('webapi/ask/pendingsView', 'Api\AskController@pendingsView');
-\Route::get('webapi/ask/historyView', 'Api\AskController@historyView');
-\Route::get('webapi/ask/nearbyView', 'Api\AskController@nearbyView');
-\Route::put('webapi/ask/pledgeRequest/{ask}', 'Api\AskController@pledgeAsk');
-\Route::put('webapi/ask/completeRequest/{ask}', 'Api\AskController@completeAsk');
+\Route::get('webapi/sosRequest/pendingsView', 'Api\SosRequestController@pendingsView');
+\Route::get('webapi/sosRequest/historyView', 'Api\SosRequestController@historyView');
+\Route::get('webapi/sosRequest/nearbyView', 'Api\SosRequestController@nearbyView');
+\Route::put('webapi/sosRequest/pledgeRequest/{sosRequest}', 'Api\SosRequestController@pledge');
+\Route::put('webapi/sosRequest/completeRequest/{sosRequest}', 'Api\SosRequestController@complete');
 
 \Route::ApiResources([
-    '/webapi/ask' => 'Api\AskController',
+    '/webapi/sosRequest' => 'Api\SosRequestController',
 ]);
 
 /**

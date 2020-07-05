@@ -44,9 +44,9 @@ class Sos extends Model
         return $this->hasMany(ShoplistItem::class, 'sos_id', 'id');
     }
     
-    public function ask()
+    public function sosRequests()
     {
-        return $this->hasMany(Ask::class, 'id');
+        return $this->hasMany(SosRequest::class, 'id');
     }
     
     public static function getDeliveryOptionsArray(): array

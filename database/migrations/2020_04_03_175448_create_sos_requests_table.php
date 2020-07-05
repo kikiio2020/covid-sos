@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 
-class CreateAsksTable extends Migration
+class CreateSosRequestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class CreateAsksTable extends Migration
      */
     public function up()
     {
-        Schema::create('asks', function (Blueprint $table) {
+        Schema::create('sos_requests', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
             $table->integer('sos_id');
@@ -22,7 +22,6 @@ class CreateAsksTable extends Migration
             $table->string('special_instruction')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('responded_by')->nullable();
-            //$table->json('chat')->default(new Expression('(JSON_ARRAY())'));
             $table->json('chat');
             $table->string('receipt_image')->nullable();
             $table->date('user_approved')->nullable();
@@ -40,5 +39,6 @@ class CreateAsksTable extends Migration
     public function down()
     {
         Schema::dropIfExists('asks');
+        Schema::dropIfExists('sos_requests');
     }
 }

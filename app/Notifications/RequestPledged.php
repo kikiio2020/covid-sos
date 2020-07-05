@@ -3,25 +3,24 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Ask;
+use App\SosRequest;
 
 class RequestPledged extends Notification
 {
     use Queueable;
 
-    private $ask;
+    private $sosRequest;
     
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Ask $ask)
+    public function __construct(SosRequest $sosRequest)
     {
-        $this->ask = $ask;
+        $this->sosRequest = $sosRequest;
     }
 
     /**
@@ -46,12 +45,12 @@ class RequestPledged extends Notification
         return (new MailMessage)
                     ->greeting('Hi ' . $notifiable->getUserName())
                     ->line('Good news!')
-                    ->line($this->ask->responder->getUserName() . 
+                    ->line($this->sosRequest->responder->getUserName() . 
                         'has responded to your request <' .
-                        $this->ask->sos->name . 
+                        $this->sosRequest->sos->name . 
                         '> . You can start communicating with them by clicking the button below.'
                     )
-                    ->action('Start Communication', url('ask/' . $this->ask->id . '/inProgress/'))
+                    ->action('Start Communication', url('sosRequest/' . $this->sosRequest->id . '/inProgress/'))
                     ->line('Thank you for being part of our community!')
                     ->line("Sincerely,")
                     ->salutation("Team " . config('app.name') . ' @ Kikiio');

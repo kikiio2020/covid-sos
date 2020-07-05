@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Ask;
+use App\SosRequest;
 
-class AsksSeeder extends Seeder
+class SosRequestsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,13 +12,13 @@ class AsksSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('asks')->insert([
+        \DB::table('sos_requests')->insert([
             [
                 'user_id' => 1,
                 'sos_id' => 1,
                 'needed_by' => '2020-04-30',
                 'special_instruction' => null,
-                'status' => Ask::STATUS_PENDING,
+                'status' => SosRequest::STATUS_PENDING,
                 'chat' => '[]',
             ],
         ]);

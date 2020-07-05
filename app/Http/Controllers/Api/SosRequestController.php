@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Ask;
-use App\Http\Resources\Ask as AskResource;
+use App\SosRequest;
+use App\Http\Resources\SosRequest as SosRequestResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\User;
@@ -17,7 +17,7 @@ use App\Http\Resources\HistoryView;
 use Illuminate\Database\Eloquent\Builder;
 use App\Notifications\RequestNeedsApproval;
 
-class AskController extends Controller
+class SosRequestController extends Controller
 {
     public function __construct()
     {
@@ -31,7 +31,7 @@ class AskController extends Controller
      */
     public function index(Request $request)
     {
-        return AskResource::collection(auth()->user()->ask()->get());
+        return SosRequestResource::collection(auth()->user()->sosRequest()->get());
     }
     
     public function inProgressView()
@@ -39,7 +39,7 @@ class AskController extends Controller
         $userId = auth()->user()->id;
         
         return InProgressView::collection(
-            Ask::inProgress()->Where(
+            SosRequest::inProgress()->Where(
                 function (Builder $query) use ($userId) {
                     $query->whereRaw("responded_by = {$userId} OR user_id = {$userId}");
                 }
@@ -49,7 +49,7 @@ class AskController extends Controller
     
     public function pendingsView()
     {
-        return AskResource::collection(auth()->user()->ask()->pending()->get());
+        return SosRequestResource::collection(auth()->user()->sosRequest()->pending()->get());
     }
     
     public function historyView()
@@ -57,7 +57,7 @@ class AskController extends Controller
         $userId = auth()->user()->id;
         
         return HistoryView::collection(
-            Ask::completed()->where(function(Builder $query) use($userId) {
+            SosRequest::completed()->where(function(Builder $query) use($userId) {
                 $query->whereRaw("responded_by = {$userId} OR user_id = {$userId}");
             })->get()
         );
@@ -98,36 +98,36 @@ class AskController extends Controller
             'chat' => 'nullable|json',
         ])->validate();
         
-        $ask = new Ask();
-        $ask->fill($request->all());
-        $ask->user_id = auth()->user()->id;
-        $ask->status = Ask::STATUS_PENDING;
-        $ask->save();
+        $sosRequest = new SosRequest();
+        $sosRequest->fill($request->all());
+        $sosRequest->user_id = auth()->user()->id;
+        $sosRequest->status = SosRequest::STATUS_PENDING;
+        $sosRequest->save();
         
-        return response(new AskResource($ask), Response::HTTP_CREATED);
+        return response(new SosRequestResource($sosRequest), Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param Ask $ask
+     * @param SosRequest $sosRequest
      * @return \Illuminate\Http\Response
      */
-    public function show(Ask $ask)
+    public function show(SosRequest $sosRequest)
     {
-        return new AskResource($ask);
+        return new SosRequestResource($sosRequest);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param Ask $ask
+     * @param SosRequest $sosRequest
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Ask $ask)
+    public function update(Request $request, SosRequest $sosRequest)
     {
-        if (!$ask->id) {
+        if (!$sosRequest->id) {
             abort(Response::HTTP_NOT_FOUND);
         }
         \Validator::make($request->all(), [
@@ -136,13 +136,13 @@ class AskController extends Controller
             'chat' => 'nullable|json',
         ])->validate();
         
-        if (Ask::STATUS_PENDING === $ask->status && $request->exists('status')) {
-            $this->clearNearbyCache($ask);
+        if (SosRequest::STATUS_PENDING === $sosRequest->status && $request->exists('status')) {
+            $this->clearNearbyCache($sosRequest);
         }
         
-        $ask->fill($request->all());
-        $ask->chat = $this->truncateChat(json_decode($request->chat));
-        $ask->save();
+        $sosRequest->fill($request->all());
+        $sosRequest->chat = $this->truncateChat(json_decode($request->chat));
+        $sosRequest->save();
         
         return response('', Response::HTTP_OK);
     }
@@ -165,84 +165,84 @@ class AskController extends Controller
     }
     
     /**
-     * @param int $askId
+     * @param int $sosRequestId
      * @return Response
      */
-    public function completeAsk(int $askId): Response
+    public function complete(int $sosRequestId): Response
     {
         $user = auth()->user();
         $userId = $user->id;
         
-        DB::transaction(function() use ($askId, $userId) {
-            $ask = DB::table('asks')->where('id', '=', $askId)->sharedLock()->first();
+        DB::transaction(function() use ($sosRequestId, $userId) {
+            $sosRequest = DB::table('sos_requests')->where('id', '=', $sosRequestId)->sharedLock()->first();
             $values = [];
             $now = Carbon::now();
             
-            if ($userId === $ask->responded_by) {
+            if ($userId === $sosRequest->responded_by) {
                 //Responder
                 $values['responder_approved'] = $now;
-                if ($ask->user_approved) {
-                    $values['status'] = Ask::STATUS_COMPLETED;
+                if ($sosRequest->user_approved) {
+                    $values['status'] = SosRequest::STATUS_COMPLETED;
                 }
             } else {
                 //Requester
                 $values['user_approved'] = $now;
-                if ($ask->responder_approved) {
-                    $values['status'] = Ask::STATUS_COMPLETED;
+                if ($sosRequest->responder_approved) {
+                    $values['status'] = SosRequest::STATUS_COMPLETED;
                 }
             }
             if (count($values)) {
-                DB::table('asks')->where('id', '=', $askId)->update($values);
+                DB::table('sos_requests')->where('id', '=', $sosRequestId)->update($values);
             }
             
         }, 5);
      
-        $ask = Ask::find($askId);
-        if (Ask::STATUS_COMPLETED === $ask->status) {
-            $user->notify(new RequestCompleted($ask));
-            $ask->responder->notify(new RequestCompleted($ask));
+        $sosRequest = SosRequest::find($sosRequestId);
+        if (SosRequest::STATUS_COMPLETED === $sosRequest->status) {
+            $user->notify(new RequestCompleted($sosRequest));
+            $sosRequest->responder->notify(new RequestCompleted($sosRequest));
             
             return response('', Response::HTTP_OK);
         } 
         
-        if ($userId === $ask->responded_by) {
+        if ($userId === $sosRequest->responded_by) {
             //Responder
-            $ask->user->notify(new RequestNeedsApproval($ask));
+            $sosRequest->user->notify(new RequestNeedsApproval($sosRequest));
         } else {
             //Requestor
-            $ask->responder->notify(new RequestNeedsApproval($ask));
+            $sosRequest->responder->notify(new RequestNeedsApproval($sosRequest));
         }
             
         return response('', Response::HTTP_OK);
     }
     
-    private function clearNearbyCache(Ask $ask): void
+    private function clearNearbyCache(SosRequest $sosRequest): void
     {
-        foreach($ask->getNearbyReverseCache() as $userId) {
+        foreach($sosRequest->getNearbyReverseCache() as $userId) {
             User::clearNearbyCacheById($userId);
         }
     }
     
-    public function pledgeAsk(int $askId): Response
+    public function pledge(int $sosRequestId): Response
     {
-        DB::transaction(function() use ($askId) {
-            $ask = DB::table('asks')->where('id', '=', $askId)->sharedLock()->first();
+        DB::transaction(function() use ($sosRequestId) {
+            $sosRequest = DB::table('sos_requests')->where('id', '=', $sosRequestId)->sharedLock()->first();
             
-            if ($ask->responded_by) {
+            if ($sosRequest->responded_by) {
                 abort(Response::HTTP_CONFLICT, 'Sorry this request is already taken.');
                 return false;
             }
             
             $values = [
                 'responded_by' => auth()->user()->id,
-                'status' => Ask::STATUS_IN_PROGRESS,
+                'status' => SosRequest::STATUS_IN_PROGRESS,
             ];
-            DB::table('asks')->where('id', '=', $askId)->update($values);
+            DB::table('sos_requests')->where('id', '=', $sosRequestId)->update($values);
         }, 5);
         
-        $ask = Ask::find($askId);
-        $ask->user->notify(new RequestPledged($ask));
-        $this->clearNearbyCache($ask);
+        $sosRequest = SosRequest::find($sosRequestId);
+        $sosRequest->user->notify(new RequestPledged($sosRequest));
+        $this->clearNearbyCache($sosRequest);
         
         return response('', Response::HTTP_OK);
     }
@@ -250,15 +250,15 @@ class AskController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Ask $ask
+     * @param SosRequest $sosRequest
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Ask $ask)
+    public function destroy(SosRequest $sosRequest)
     {
-        if (!$ask->id) {
+        if (!$sosRequest->id) {
             abort(Response::HTTP_NOT_FOUND);
         }
-        $ask->delete();
+        $sosRequest->delete();
         
         return response('', Response::HTTP_OK);
     }

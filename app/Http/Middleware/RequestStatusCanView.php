@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Response;
-use App\Ask;
 
 class RequestStatusCanView
 {
@@ -17,18 +16,18 @@ class RequestStatusCanView
      */
     public function handle($request, Closure $next, int $status)
     {
-        $ask = $request->ask;
+        $sosRequest = $request->sosRequest;
 
-        if (!$ask) {
+        if (!$sosRequest) {
             abort(Response::HTTP_NOT_FOUND);
         }
         
-        if ($status !== $ask->status) {
+        if ($status !== $sosRequest->status) {
             abort(Response::HTTP_NOT_FOUND, 'Sorry the information you are looking for is not available');
         }
         
         $userId = $request->user()->id; 
-        if ($userId !== $ask->responded_by && $userId !== $ask->user_id) {
+        if ($userId !== $sosRequest->responded_by && $userId !== $sosRequest->user_id) {
             abort(Response::HTTP_FORBIDDEN, 'Sorry the information you are looking for is not available');
         }
         

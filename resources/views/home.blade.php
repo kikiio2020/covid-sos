@@ -20,7 +20,6 @@
                 :payment-options="{{json_encode(\App\Sos::getPaymentOptionsArray())}}"
         		user-id="{{ auth()->user()->id }}"
         		user-name="{{ auth()->user()->getUserName() }}"
-        		:sos-options="{{ json_encode($sosOptions) }}"
 				:current-tab-index="{{ auth()->user()->getHomeTabIndexCache() }}"        		
         	></home>
         </div>

@@ -1,6 +1,8 @@
 <template>
+    <div>
+    <test-sos-array></test-sos-array>
     <crud-control
-        id="asks-pending-model-view"
+        id="pending-model-view"
         ref="myModelView"
         table-name=""
         :initial-values="{ 
@@ -26,13 +28,13 @@
         	'remove',	
         ]"
         :modal-fields="modalFields"
-        api="/webapi/ask"
+        api="/webapi/sosRequest"
         gridUrlQuery="/pendingsView"
         :insertable="!isResponder"
         @modal-close="actionCancel"
         @async-returns="actionCompletes"
-    >
-    </crud-control>
+    ></crud-control>
+    </div>
 </template>
 
 <script>
@@ -42,7 +44,6 @@ export default {
     components: {CrudControl},
     props: [
         'isResponder',
-        'sosOptions',
     ],
     data() {
         const now = new Date();
@@ -53,7 +54,40 @@ export default {
         maxNeededByDate.setMonth(maxNeededByDate.getMonth() + 1);
 
         return {
-            modalFields: [
+        }
+    },
+    methods: {
+        insertModel(target, modalRecordData) {
+            this.$refs.myModelView.insertModel(target, modalRecordData);
+        },
+        onSave() {
+        },
+        actionCompletes: function() {
+        	this.$store.commit('endWorkflow');
+        },
+        actionCancel: function() {
+        	this.$store.commit('workflowCancel');
+        },
+    },
+    computed: {
+    	sosArray: function() {
+    		return this.$store.state.sosArray.map(sos => {
+    			return {
+    				value: sos.id,
+    				text: sos.name,
+    			}
+    		})
+    	},
+    	
+    	modalFields: function() {
+    		const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const minNeededByDate = new Date(today);
+            minNeededByDate.setDate(minNeededByDate.getDate() + 7);
+            const maxNeededByDate = new Date(today);
+            maxNeededByDate.setMonth(maxNeededByDate.getMonth() + 1);
+            
+    		return [
                 {
                     fieldType: "model-select-field",
                     caption: "SOS",
@@ -62,7 +96,7 @@ export default {
                     id: "sos_id",
                     required: true,
                     rules: "required",
-                    options: this.sosOptions,
+                    options: this.sosArray,
                     class: "my-3 mr-3",
                 },
                 {
@@ -86,26 +120,10 @@ export default {
                     id: "special_instruction",
                     class: "my-3 mr-3",
                 },
-
-                //TODO upload receipt
-
-            ],
-        }
+            ];
+    	}
+    
     },
-    methods: {
-        insertModel(target, modalRecordData) {
-            this.$refs.myModelView.insertModel(target, modalRecordData);
-        },
-        onSave() {
-        },
-        actionCompletes: function() {
-        	this.$store.commit('endWorkflow');
-        },
-        actionCancel: function() {
-        	this.$store.commit('workflowCancel');
-        }
-    },
-    computed: {},
     mounted() {
     }
 }

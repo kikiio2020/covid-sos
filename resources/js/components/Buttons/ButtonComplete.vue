@@ -8,7 +8,7 @@
 <script>
 export default {
     components: {},
-    props: ['askId'],
+    props: ['sosRequestId'],
     data() {
         return {
         	text: 'Complete',
@@ -23,7 +23,7 @@ export default {
         	this.$bvModal.msgBoxConfirm('Please confirm Complete Request.')
         		.then(confirm => {
 	       			if (confirm) {
-	       				axios.put('/webapi/ask/completeRequest/' + this.askId, [])
+	       				axios.put('/webapi/sosRequest/completeRequest/' + this.sosRequestId, [])
 	                  		.then(() => {
 	                  			this.$root.$bvToast.toast('Confirm Complete Request', {
 	                               title: 'Thanks for confirming!',

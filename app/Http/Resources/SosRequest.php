@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class Ask extends JsonResource
+class SosRequest extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,11 @@ class Ask extends JsonResource
      */
     public function toArray($request)
     {
-        $askObjectArray = parent::toArray($request);
+        $sosRequestObjectArray = parent::toArray($request);
          
-        return array_merge($askObjectArray, [
+        return array_merge($sosRequestObjectArray, [
             'sos_text' => $this->resource->sos->name,
-            'status_txt' => __('model.ask.status.' . $askObjectArray['status']),
+            'status_txt' => __('model.sos_request.status.' . $sosRequestObjectArray['status']),
         ]);
          
     }

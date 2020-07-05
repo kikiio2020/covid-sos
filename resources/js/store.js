@@ -12,17 +12,18 @@ export const homeTabIndex = {
 };
 
 const workflowOriginatorTabIndex = {
-	sosCreateNewAsk: homeTabIndex.sos,
+	sosCreateNewRequest: homeTabIndex.sos,
 };
 
 const workflowNewTabIndex = {
-	sosCreateNewAsk: homeTabIndex.pending,
+	sosCreateNewRequest: homeTabIndex.pending,
 };
 
 export const store = new Vuex.Store({
 	state: {
 		currentWorkflow: '',
 		currentHomeTabIndex: 0,
+		sosArray: [],
 	},
 
 	getters: {
@@ -46,6 +47,12 @@ export const store = new Vuex.Store({
 			state.currentHomeTabIndex = index;
 			store.dispatch('cacheHomeTabIndex', index);
 		},
+		setSosArray: function(state, sosArray) {
+			state.sosArray = sosArray;
+		},
+		appendSosArray: function(state, sosItem) {
+			state.sosArray.push(sosItem);
+		},
 	},
 	
 	actions: {
@@ -53,6 +60,11 @@ export const store = new Vuex.Store({
 			axios.put('/webapi/user/updateHomeTabIndexCache', {
         		index: index,
         	});
+		},
+		loadSosArray(context) {
+			axios.get('/webapi/sos/sosView').then((response) => {
+				context.commit('setSosArray', response.data.data);
+			}); 
 		}
 	},
 });

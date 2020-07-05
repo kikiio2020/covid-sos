@@ -16,7 +16,8 @@
      -->
     <!--Profile Update-->
     <b-row><b-col>
-    <crud-control
+    <!-- <crud-control-->
+    <model-view-2
         id="shoplist-view"
         ref="myModelView"
         table-name=""
@@ -51,8 +52,10 @@
         modal-size='lg'
         :table-properties="tableProperties"
         @async-returns="actionCompletes"
-    >
-    </crud-control>
+        @record-created="reloadSosArray"
+        @record-removed="reloadSosArray"
+    ></model-view-2>
+    <!--  ></crud-control>-->
     </b-col></b-row>
 </b-container>
 </div>
@@ -141,7 +144,6 @@ export default {
                     name: "Delivery Option",
                     placeholder: "Delivery Option *",
                     id: "delivery_option",
-                    //required: true,
                     rules: "required",
                     options: this.deliveryOptions,
                     class: "my-3 mr-3",
@@ -152,7 +154,6 @@ export default {
                     name: "Payment Option",
                     placeholder: "Payment Option *",
                     id: "payment_option",
-                    //required: true,
                     rules: "required",
                     options: this.paymentOptions,
                     class: "my-3 mr-3",
@@ -193,12 +194,15 @@ export default {
     },
     methods: {
         makeRequest: function(sos) {
-        	this.$emit('sosCreatesNewAsk', {
+        	this.$emit('sosCreatesNewRequest', {
                 sos_id: sos.id
             });
         },
         actionCompletes: function() {
         	this.$store.commit('endWorkflow');
+        },
+        reloadSosArray: function() {
+        	this.$store.dispatch('loadSosArray');
         }
     },
     computed: {

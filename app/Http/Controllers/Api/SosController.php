@@ -142,6 +142,9 @@ class SosController extends Controller
         if (!$sos->id) {
             abort(Response::HTTP_NOT_FOUND);
         }
+        if ($sos->withCount('sosRequests')->get()) {
+            abort(Response::HTTP_CONFLICT, "SOS already in use");
+        }
         foreach (['receipt_image'] as $imageField) {
             if ($sos->$imageField && Storage::disk('uploads')->exists($sos->$imageField)) {
                 Storage::disk('uploads')->delete($sos->$imageField);

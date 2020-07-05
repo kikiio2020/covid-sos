@@ -9,31 +9,30 @@
         <b-col>
             <b-tabs content-class="mt-3" v-model="currentHomeTabIndex">
                 <!-- :active="isResponder" :disabled="!isResponder"  -->
-                <b-tab title="Nearby Needs!" lazy ref="nearbyAsksView">
-                    <nearby-asks-model-view
+                <b-tab title="Nearby Needs!" lazy ref="nearbyView">
+                    <nearby-model-view
                         :is-responder="isResponder"
                         :user-id="userId"
-                        ref="nearbyAsksModelView"
+                        ref="nearbyModelView"
                         @nearbyNewPledged="newPledged"
-                    ></nearby-asks-model-view>
+                    ></nearby-model-view>
                 </b-tab>
-                <b-tab title="In Progress" lazy ref="inProgressAsksView">
-                    <in-progress-asks-model-view
+                <b-tab title="In Progress" lazy ref="inProgressView">
+                    <in-progress-model-view
                         :is-responder="isResponder"
                         :delivery-options="deliveryOptions"
                         :payment-options="paymentOptions"
                         :user-id="userId"
                         :user-name="userName"
-                        ref="inProgressAsksModelView"
-                    ></in-progress-asks-model-view>
+                        ref="inProgressModelView"
+                    ></in-progress-model-view>
                 </b-tab>
                 <!-- :active="!isResponder" -->
-                <b-tab title="Pendings" lazy ref="pendingAsksView">
-                    <pending-asks-model-view
+                <b-tab title="Pendings" lazy ref="pendingView">
+                    <pending-model-view
                         :is-responder="isResponder"
-                        :sos-options="sosOptions"
-                        ref="pendingAsksModelView"
-                    ></pending-asks-model-view>
+                        ref="pendingModelView"
+                    ></pending-model-view>
                 </b-tab>
                 <b-tab title="Manage my SOSs" lazy ref="sosView">
                     <sos-model-view
@@ -41,7 +40,7 @@
                         :delivery-options="deliveryOptions"
                         :payment-options="paymentOptions"
                         ref="sosModelView"
-                        @sosCreatesNewAsk="newAsk($event)"
+                        @sosCreatesNewRequest="newRequest($event)"
                     ></sos-model-view>
                 </b-tab>
                 <b-tab title="History" lazy ref="historyView">
@@ -77,17 +76,16 @@ export default {
         'paymentOptions',
         'userId',
         'userName',
-        'sosOptions',
         'currentTabIndex'
     ],
     data() {
         return {}
     },
     methods: {
-        newAsk: function (data) {
-            this.$store.commit('startWorkflow', 'sosCreateNewAsk');
+        newRequest: function (data) {
+            this.$store.commit('startWorkflow', 'sosCreateNewRequest');
         	this.$nextTick(function () {
-                this.$refs.pendingAsksModelView.insertModel({}, data);
+                this.$refs.pendingModelView.insertModel({}, data);
             })
         },
         newPledged:function () {
@@ -104,8 +102,11 @@ export default {
     		}
     	}
     },
+	created() {
+    	this.$store.dispatch('loadSosArray');	
+    },
     mounted() {
     	this.currentHomeTabIndex = this.currentTabIndex;
-    }
+    },
 }
 </script>

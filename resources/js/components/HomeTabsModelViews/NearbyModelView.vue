@@ -44,7 +44,7 @@
 	        	},
 	       	]"
             :modal-fields="modalFields"
-            api="/webapi/ask"
+            api="/webapi/sosRequest"
             gridUrlQuery="/nearbyView"
             :insertable="false"
             :table-properties="tableProperties"
@@ -137,7 +137,7 @@ export default {
             ).then(confirm => {
                 if (confirm) {
                     axios.put(
-                        '/webapi/ask/pledgeRequest/' + request.id
+                        '/webapi/sosRequest/pledgeRequest/' + request.id
                         /*, 
                         {
                             id: request.id,

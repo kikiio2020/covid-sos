@@ -1,7 +1,7 @@
 <template>
     <div>
 	    <crud-control
-	        id="asks-in-progress-model-view"
+	        id="in-progress-model-view"
 	        ref="myModelView"
 	        table-name=""
 	        :initial-values="{ 
@@ -71,7 +71,7 @@
 	       		}
 	       	]"
 	        :modal-fields="modalFields"
-	        api="/webapi/ask"
+	        api="/webapi/sosRequest"
 	        gridUrlQuery="/inProgressView"
 	        :insertable="false"
 	        @chatRequest="chatRequest"
@@ -84,8 +84,8 @@
     	<chat
     		id="chatBox"
     		:user-name="userName"
-    		api="/webapi/ask"
-    		:model-id="currentAskForChat.id"
+    		api="/webapi/sosRequest"
+    		:model-id="currentRequestForChat.id"
     	></chat>
   	</div>
 </template>
@@ -155,7 +155,7 @@ export default {
                     id: "special_instructions"
                 },
             ],
-            currentAskForChat: {
+            currentRequestForChat: {
            		chat: '[]'
             },
         }
@@ -165,7 +165,7 @@ export default {
             this.$refs.myModelView.insertModel(target);
         },
         chatRequest(row) {
-        	this.currentAskForChat = row;
+        	this.currentRequestForChat = row;
         	this.$bvModal.show('chatBox');
         },
         completeRequest(row) {
@@ -176,7 +176,7 @@ export default {
         	this.$bvModal.msgBoxConfirm(confirmMsg)
             .then(value => {
             	if (value) {
-            		axios.put('webapi/ask/completeRequest/' + row.id)
+            		axios.put('webapi/sosRequest/completeRequest/' + row.id)
             			.then((response) => {
             				this.$bvModal.msgBoxOk(
            						isResponder ? 
@@ -209,9 +209,8 @@ export default {
 	            });
         },
         openFullView(data) {
-        	window.open('/ask/' + data.id + '/inProgress', '_blank');
+        	window.open('/sosRequest/' + data.id + '/inProgress', '_blank');
         },
-        
     },
     computed: {},
     mounted() {

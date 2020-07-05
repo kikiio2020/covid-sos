@@ -3,7 +3,7 @@
 	<b-modal 
 		:id="id" 
 		title="Chat" 
-		ok-title="Send" 
+		ok-title="Send & Close" 
 		@ok="submitChat"
 		:lazy="true"
 		@change="modalToShow"
@@ -14,6 +14,7 @@
             <b-row><b-col>
                 <chat-log
                 	:chat="JSON.stringify(chat)"
+                	class="border border-secondary"
                 ></chat-log>
                 <!-- 
                 <div 
@@ -116,9 +117,13 @@ export default {
                 chat: JSON.stringify(this.chat)
             }).then(response => {
                 this.chatInput = '';
+                this.$root.$bvToast.toast('Message sent', {
+                    title: 'Chat',
+                    variant: 'success',
+                });
             }).catch(error => {
                 this.$root.$bvToast.toast('Error submitting chat.', {
-                    title: Chat,
+                    title: 'Chat',
                     variant: 'danger',
                 });
             });        

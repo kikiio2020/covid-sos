@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Middleware\UnknownStatus;
-use App\Ask;
+use App\SosRequest;
 
 class HomeController extends Controller
 {
@@ -59,19 +58,19 @@ class HomeController extends Controller
         return view('hujocoin');
     }
     
-    public function askStandAloneInProgressView(Ask $ask)
+    public function sosRequestStandAloneInProgressView(SosRequest $sosRequest)
     {
-        return view('standalone.ask', [
-            'ask' => $ask,
-            'isInProgress' => Ask::STATUS_IN_PROGRESS === $ask->status,
+        return view('standalone.sosrequest', [
+            'sosRequest' => $sosRequest,
+            'isInProgress' => SosRequest::STATUS_IN_PROGRESS === $sosRequest->status,
         ]);
     }
     
-    public function askStandAloneHistoryView(Ask $ask)
+    public function sosRequestStandAloneHistoryView(SosRequest $sosRequest)
     {
-        return view('standalone.ask', [
-            'ask' => $ask,
-            'isInProgress' => Ask::STATUS_IN_PROGRESS === $ask->status,
+        return view('standalone.sosrequest', [
+            'sosRequest' => $sosRequest,
+            'isInProgress' => SosRequest::STATUS_IN_PROGRESS === $sosRequest->status,
         ]);
     }
     

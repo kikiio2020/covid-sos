@@ -1,6 +1,6 @@
 <template>
     <crud-control
-       	id="asks-history-model-view"
+       	id="history-model-view"
         ref="myModelView"
         table-name=""
         :initial-values="{ 
@@ -50,7 +50,7 @@
        		}
        	]"
         :modal-fields="modalFields"
-        api="/webapi/ask"
+        api="/webapi/sosRequest"
         gridUrlQuery="/historyView"
         :insertable="false"
         @openFullView="openFullView"
@@ -130,7 +130,7 @@ export default {
     },
     methods: {
     	openFullView(data) {
-        	window.open('/ask/' + data.id + '/history', '_blank');
+        	window.open('/sosRequest/' + data.id + '/history', '_blank');
         },
     },
     computed: {},

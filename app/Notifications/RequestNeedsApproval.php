@@ -5,22 +5,22 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Ask;
+use App\SosRequest;
 
 class RequestNeedsApproval extends Notification
 {
     use Queueable;
 
-    private $ask;
+    private $sosRequest;
     
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Ask $ask)
+    public function __construct(SosRequest $sosRequest)
     {
-        $this->ask = $ask;
+        $this->sosRequest = $sosRequest;
     }
 
     /**
@@ -42,25 +42,25 @@ class RequestNeedsApproval extends Notification
      */
     public function toMail($notifiable)
     {
-        $isResponder = $notifiable->id === $this->ask->responded_by;
+        $isResponder = $notifiable->id === $this->sosRequest->responded_by;
         
         if ($isResponder) {
-            $line1 = $this->ask->user->getUserName() . ' ' .
+            $line1 = $this->sosRequest->user->getUserName() . ' ' .
                 'has indicated the work for their request ' .
-                '<' . $this->ask->sos->name . '> is now completed. Thanks!';
+                '<' . $this->sosRequest->sos->name . '> is now completed. Thanks!';
             $line2 = 'Please confirm and close the request by following the link below' .
                 'to the request and click the \'Complete\' button.';
         } else {
-            $line1 = 'Good news! ' . $this->ask->responder->getUserName() . ' ' .
+            $line1 = 'Good news! ' . $this->sosRequest->responder->getUserName() . ' ' .
                 'has now completed the work for your request ' .
-                '<' . $this->ask->sos->name . '> ';
+                '<' . $this->sosRequest->sos->name . '> ';
             $line2 = 'Please follow the link below to the request and click the ' .
                 '\'Complete\' button to confirm and close the request.';
         }
         
-        $subject = config('mail.subjectPrefix') . 'Re: Request <' . $this->ask->sos->name . '>';
+        $subject = config('mail.subjectPrefix') . 'Re: Request <' . $this->sosRequest->sos->name . '>';
         
-        $url = url('ask/' . $this->ask->id . '/inProgress/');
+        $url = url('sosRequest/' . $this->sosRequest->id . '/inProgress/');
         
         //framework/src/Illuminate/Notifications/resources/views/email.blade.php
         return (new MailMessage)
@@ -68,7 +68,7 @@ class RequestNeedsApproval extends Notification
             ->greeting('Hi ' . $notifiable->getUserName())
             ->line($line1)
             ->line($line2)
-            ->action($this->ask->sos->name, $url)
+            ->action($this->sosRequest->sos->name, $url)
             ->line('Thank you for being part of our community!')
             ->line("Sincerely,")
             ->salutation("Team " . config('app.name') . ' @ Kikiio');

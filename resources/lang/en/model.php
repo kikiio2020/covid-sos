@@ -1,13 +1,13 @@
 <?php 
-use App\Ask;
+use App\SosRequest;
 use App\Sos;
 
 return [
-    'ask' => [
+    'sos_request' => [
         'status' => [
-            Ask::STATUS_PENDING => 'Pending',
-            Ask::STATUS_IN_PROGRESS => 'In Progress',
-            Ask::STATUS_COMPLETED => 'Completed',
+            SosRequest::STATUS_PENDING => 'Pending',
+            SosRequest::STATUS_IN_PROGRESS => 'In Progress',
+            SosRequest::STATUS_COMPLETED => 'Completed',
         ],
     ],
     'sos' => [
