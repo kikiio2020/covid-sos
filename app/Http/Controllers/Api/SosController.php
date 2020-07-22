@@ -38,40 +38,7 @@ class SosController extends Controller
     {
         return SosResource::collection(auth()->user()->sos);
     }
-    
-    /*
-    public function pledged()
-    {
-        return SosResource::collection(auth()->user()->pledged);
-    }
-    
-    public function need()
-    {
-        return SosResource::collection(auth()->user()->sos()->whereIn(
-            'status', 
-            [ Sos::STATUS_PENDING ]
-        )->get());
-    }
-    
-    public function history()
-    {
-        $userId = auth()->user()->id;
-        
-        return SosResource::collection(
-            Sos::where('status', '=', Sos::STATUS_COMPLETED )
-                ->whereRaw(
-                    "responded_by = {$userId} OR created_by = {$userId}"
-                )->get()
-        );
-    }
-    
-    public function nearby()
-    {
-        //return SosResource::collection(auth()->user()->pledged);
-    }
-    */
-    
-    
+   
     /**
      * Store a newly created resource in storage.
      *
@@ -82,8 +49,9 @@ class SosController extends Controller
     {
         \Validator::make($request->all(), [
             'name' => 'required',
-            'delivery_option' => 'required',
-            'payment_option' => 'required',
+            'type' => 'required',
+            //'delivery_option' => 'required',
+            //'payment_option' => 'required',
         ])->validate();
         
         $sos = new Sos();
@@ -102,7 +70,6 @@ class SosController extends Controller
      */
     public function show(Sos $sos)
     {
-        //return response()->json($sos->toArray());
         return new SosResource($sos);
     }
 
@@ -121,8 +88,7 @@ class SosController extends Controller
         \Validator::make($request->all(), [
             'id' => 'required',
             'name' => 'sometimes|required',
-            'delivery_option' => 'sometimes|required',
-            'payment_option' => 'sometimes|required',
+            'type' => 'sometimes|required',
         ])->validate();
         
         $sos->fill($request->all());
@@ -142,9 +108,11 @@ class SosController extends Controller
         if (!$sos->id) {
             abort(Response::HTTP_NOT_FOUND);
         }
-        if ($sos->withCount('sosRequests')->get()) {
+        $sos->loadCount('sosRequests');
+        if ($sos->sos_requests_count) {
             abort(Response::HTTP_CONFLICT, "SOS already in use");
         }
+        
         foreach (['receipt_image'] as $imageField) {
             if ($sos->$imageField && Storage::disk('uploads')->exists($sos->$imageField)) {
                 Storage::disk('uploads')->delete($sos->$imageField);

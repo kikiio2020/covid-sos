@@ -20,8 +20,6 @@
                 <b-tab title="In Progress" lazy ref="inProgressView">
                     <in-progress-model-view
                         :is-responder="isResponder"
-                        :delivery-options="deliveryOptions"
-                        :payment-options="paymentOptions"
                         :user-id="userId"
                         :user-name="userName"
                         ref="inProgressModelView"
@@ -37,8 +35,7 @@
                 <b-tab title="Manage my SOSs" lazy ref="sosView">
                     <sos-model-view
                         :is-responder="isResponder"
-                        :delivery-options="deliveryOptions"
-                        :payment-options="paymentOptions"
+                        :types="types"
                         ref="sosModelView"
                         @sosCreatesNewRequest="newRequest($event)"
                     ></sos-model-view>
@@ -72,8 +69,7 @@ export default {
     components: {},
     props: [
         'isResponder',
-        'deliveryOptions', 
-        'paymentOptions',
+        'types',
         'userId',
         'userName',
         'currentTabIndex'

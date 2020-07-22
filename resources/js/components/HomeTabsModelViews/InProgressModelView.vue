@@ -9,10 +9,6 @@
 	            sos_text: '', 
 	            description: '',
 	            needed_by: new Date(),
-	            vendor_name: '',
-	            vendor_address: '',
-	            delivery_option: null,
-	            payment_option: null,
 	            special_instructions: null,
 	            chat: null,
 	        }"
@@ -24,6 +20,10 @@
 	            {
 	                key: 'sos_text',
 	                label: 'Name', 
+	                sortable: true,
+	            },
+	            {
+	                key: 'type',
 	                sortable: true,
 	            },
 	            {
@@ -97,8 +97,6 @@ export default {
     components: {CrudControl},
     props: [
         'isResponder',
-        'deliveryOptions', 
-        'paymentOptions',
         'userId',
         'userName',
     ],
@@ -119,6 +117,12 @@ export default {
                 },
                 {   
                     fieldType: "model-read-only-field",
+                    placeholder: "Type",
+                    name: "type",
+                    id: "type"
+                },
+                {   
+                    fieldType: "model-read-only-field",
                     placeholder: "Request Description",
                     name: "sos_description",
                     id: "sos_description"
@@ -132,27 +136,9 @@ export default {
                 },
                 {
                     fieldType: "model-read-only-field",
-                    placeholder: "Vendor",
-                    name: "vendor_name",
-                    id: "vendor_name"
-                },
-                {
-                    fieldType: "model-gmap-link-field",
-                    placeholder: "Vendor Address",
-                    name: "vendor_address",
-                    id: "vendor_address"
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Delivery",
-                    name: "delivery_option",
-                    id: "delivery_option"
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Special Instructions",
-                    name: "special_instructions",
-                    id: "special_instructions"
+                    placeholder: "Detail Instructions",
+                    name: "detail_instructions",
+                    id: "detail_instructions"
                 },
             ],
             currentRequestForChat: {

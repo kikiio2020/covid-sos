@@ -11,16 +11,10 @@ return [
         ],
     ],
     'sos' => [
-        'delivery_option' => [
-            Sos::DELIVARY_OPTION_DOORFRONT => 'Door Front',
-            Sos::DELIVARY_OPTION_INTERCOM => 'Intercom',
-            Sos::DELIVARY_OPTION_OTHERS => 'Others',
-        ],
-        'payment_option' => [
-            Sos::PAYMENT_OPTION_CASH => 'Cash',
-            Sos::PAYMENT_OPTION_NOT_APPLICABLE => 'Not Applicable',
-            Sos::PAYMENT_OPTION_OTHERS => 'Others',
-            Sos::PAYMENT_OPTION_PAID_ONLINE => 'Paid Online',
+        'type' => [
+            Sos::TYPE_GROCERY => 'Grocery',
+            Sos::TYPE_SKILL_SHARE => 'Skill Share',
+            Sos::TYPE_CHORE => 'Chore',
         ],
     ] 
 ];

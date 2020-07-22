@@ -25,15 +25,23 @@
                     sortable: true,
                 },
                 {
+                	key: 'type', 
+                    sortable: true,
+                },
+                {
                     key: 'hujo', 
                     sortable: true,
                 },
                 {
                     key: 'distance_km', 
-                    label: 'Distance (KM)',
+                    label: 'KM',
                     sortable: true,
                 },
-                'actions',
+                {
+                	key: 'actions',
+                	label: '',
+                }
+                
             ]"
             :actions="[
 	        	'details',

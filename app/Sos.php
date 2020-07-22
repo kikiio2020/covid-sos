@@ -6,26 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sos extends Model
 {
-    public const PAYMENT_OPTION_PAID_ONLINE = 0;
-    public const PAYMENT_OPTION_CASH = 1;
-    public const PAYMENT_OPTION_OTHERS = 2;
-    public const PAYMENT_OPTION_NOT_APPLICABLE = 3;
-    
-    public const DELIVARY_OPTION_DOORFRONT = 0;
-    public const DELIVARY_OPTION_INTERCOM = 1;
-    public const DELIVARY_OPTION_OTHERS = 2;
+    public const TYPE_GROCERY = 0;
+    public const TYPE_SKILL_SHARE = 1;
+    public const TYPE_CHORE = 2;
     
     protected $table = 'sos';
     
     protected $fillable = [
-        'name', 
+        'name',
+        'type',
         'description', 
-        'delivery_option', 
-        'payment_option', 
-        'other_instruction', 
+        'detail_instructions', 
         'needed_by', 
-        'vendor_name', 
-        'vendor_address',
         'created_by',
     ];
     
@@ -46,43 +38,23 @@ class Sos extends Model
     
     public function sosRequests()
     {
-        return $this->hasMany(SosRequest::class, 'id');
+        return $this->hasMany(SosRequest::class, 'sos_id', 'id');
     }
     
-    public static function getDeliveryOptionsArray(): array
+    public static function getTypesArray(): array
     {
         return array_map(
             function($item){
                 return [
                     'value' => $item,
-                    'text' => __('model.sos.delivery_option.' . $item),
-                ];    
-            }, 
-            [
-                self::DELIVARY_OPTION_DOORFRONT,
-                self::DELIVARY_OPTION_INTERCOM,
-                self::DELIVARY_OPTION_OTHERS,
-            ]
-        );
-    }
-    
-    public static function getPaymentOptionsArray(): array
-    {
-        return array_map(
-            function($item){
-                return [
-                    'value' => $item,
-                    'text' => __('model.sos.payment_option.' . $item),
+                    'text' => __('model.sos.type.' . $item),
                 ];
             },
             [
-                self::PAYMENT_OPTION_PAID_ONLINE,
-                self::PAYMENT_OPTION_CASH,
-                self::PAYMENT_OPTION_OTHERS,
-                self::PAYMENT_OPTION_NOT_APPLICABLE,
+                self::TYPE_GROCERY,
+                self::TYPE_SKILL_SHARE,
+                self::TYPE_CHORE,
             ]
-        );
+            );
     }
-    
-    
 }

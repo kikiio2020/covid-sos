@@ -2,6 +2,7 @@
     <ValidationProvider :name="modalFieldProperties.caption" :rules="modalFieldProperties.rules" v-slot="validationContext">
         
         <component 
+            ref="dynComp"
             :is="modalFieldComponent" 
             v-bind="modalFieldComponentProperties"
             v-model="vModel"
@@ -19,15 +20,15 @@
 </template>
 <script>
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required, image, size, regex } from 'vee-validate/dist/rules';
+import * as rules from 'vee-validate/dist/rules';
+import { messages } from 'vee-validate/dist/locale/en.json';
 
-extend('image', image);
-extend('size', size);
-extend('required', {
-    ...required,
-    message: "{_field_} is required"
+Object.keys(rules).forEach(rule => {
+	extend(rule, {
+    	...rules[rule],
+	    message: messages[rule],
+  	});
 });
-extend('regex', regex);
 
 export default {
     components: {ValidationProvider, ValidationObserver},
@@ -65,7 +66,6 @@ export default {
         }
     },
     mounted() {
-    	console.log(this.modalFieldComponentProperties.content);
     },
 }
 </script>

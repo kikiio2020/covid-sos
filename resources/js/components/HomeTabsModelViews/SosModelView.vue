@@ -16,7 +16,16 @@
      -->
     <!--Profile Update-->
     <b-row><b-col>
-    <!-- <crud-control-->
+    <!-- <crud-control  
+    	***TODO*** 
+    	It seems vee-validate is preventing the pacakage from 
+    	seeing state mutations of the hasRequireModelField computed array
+    	inside the v-for loop of modal-field. I suspect somehow more is needed
+    	inside plugin.js in the packahe to properly make ModalField properly visible 
+    	in the main component CrudControl.
+    	Vue 3 and Bootstrap 5 also coming up so might make more sense to defer 
+    	further investigation and major FE work until we get to the new versions
+    -->
     <model-view-2
         id="shoplist-view"
         ref="myModelView"
@@ -24,10 +33,10 @@
         :initial-values="{ 
             id: 0, 
             name: '', 
+            type: null,
             description: '',
-            vendor_name: '',
-            vendor_address: '',
             shoplist: {},
+            detail_instructions: '',
         }"
         :grid-fields="[
             {
@@ -55,7 +64,7 @@
         @record-created="reloadSosArray"
         @record-removed="reloadSosArray"
     ></model-view-2>
-    <!--  ></crud-control>-->
+    
     </b-col></b-row>
 </b-container>
 </div>
@@ -66,8 +75,7 @@ import CrudControl from '@kikiio2020/vue-crud-control';
 export default {
     components: {CrudControl},
     props: [
-        'deliveryOptions', 
-        'paymentOptions',
+        'types',
     ],
     data() {
         return {
@@ -84,8 +92,8 @@ export default {
             modalFields: [
                 {   
                     fieldType: "b-form-input",
-                    caption: "Request Name",
-                    placeholder: "Request Name *",
+                    caption: "SOS Name",
+                    placeholder: "SOS Name *",
                     required: true,
                     rules: "required",
                     name: "name",
@@ -97,6 +105,16 @@ export default {
                         placement: 'top',
                         variant: 'primary'
                     },
+                },
+                {
+                    fieldType: "model-select-field",
+                    caption: "Type",
+                    name: "Type",
+                    placeholder: "Type *",
+                    id: "type",
+                    rules: "required",
+                    options: this.types,
+                    class: "my-3 mr-3",
                 },
                 {
                     fieldType: "b-form-textarea",
@@ -112,73 +130,12 @@ export default {
                         variant: 'primary'
                     },
                 },
-                {   
-                    fieldType: "b-form-input",
-                    caption: "Store Name",
-                    placeholder: "Store Name *",
-                    required: true,
-                    rules: "required|max:255",
-                    name: "vendor_name",
-                    id: "vendor_name",
-                    class: "my-3 mr-3",
-                },
-                {
-                    fieldType: "b-form-input",
-                    caption: "Store Address",
-                    placeholder: "Store Address *",
-                    required: true,
-                    rules: "required|max:255",
-                    name: "vendor_address",
-                    id: "vendor_address",
-                    class: "my-3 mr-3",
-                    vBPopover: {
-                        trigger: 'hover',
-                        content: 'Please keep to cloest store to your address to minimize delivery distance',
-                        placement: 'top',
-                        variant: 'primary'
-                    },
-                },
-                {
-                    fieldType: "model-select-field",
-                    caption: "Delivery Option",
-                    name: "Delivery Option",
-                    placeholder: "Delivery Option *",
-                    id: "delivery_option",
-                    rules: "required",
-                    options: this.deliveryOptions,
-                    class: "my-3 mr-3",
-                },
-                {
-                    fieldType: "model-select-field",
-                    caption: "Payment Option",
-                    name: "Payment Option",
-                    placeholder: "Payment Option *",
-                    id: "payment_option",
-                    rules: "required",
-                    options: this.paymentOptions,
-                    class: "my-3 mr-3",
-                },
-                {
-                    fieldType: "b-form-input",
-                    caption: "Compensation",
-                    placeholder: "Helper Compensation",
-                    rules: { regex:/^\d{1,4}(\.\d{1,2})?$/ },
-                    name: "compensation",
-                    id: "compensation",
-                    class: "my-3 mr-3",
-                    vBPopover: {
-                        trigger: 'hover',
-                        content: 'Enter money amount eg) 10.50. As a reference, hired couriers earn about $10 each trip.',
-                        placement: 'top',
-                        variant: 'primary'
-                    },
-                },
                 {
                     fieldType: "b-form-textarea",
-                    caption: "Other Instructions",
-                    placeholder: "Other Instructions",
-                    name: "other_instructions",
-                    id: "other_instructions",
+                    caption: "Detail Instructions",
+                    placeholder: "Detail Instructions",
+                    name: "detail_instructions",
+                    id: "detail_instructions",
                     class: "my-3 mr-3",
                 },
                 {
@@ -188,6 +145,9 @@ export default {
                     name: "shoplist",
                     id: "shoplist",
                     requireModel: true,
+                    conditions: {
+                    	type: '0',
+                    },
                 },
             ],
         }

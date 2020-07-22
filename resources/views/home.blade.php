@@ -16,10 +16,9 @@
         <div class="col-md-12">
         	<home
         		:is-responder="{{ auth()->user()->status == \App\User::STATUS_RESPONDER ? 'true' : 'false' }}"
-        		:delivery-options="{{json_encode(\App\Sos::getDeliveryOptionsArray())}}"
-                :payment-options="{{json_encode(\App\Sos::getPaymentOptionsArray())}}"
         		user-id="{{ auth()->user()->id }}"
         		user-name="{{ auth()->user()->getUserName() }}"
+        		:types="{{json_encode(\App\Sos::getTypesArray())}}"
 				:current-tab-index="{{ auth()->user()->getHomeTabIndexCache() }}"        		
         	></home>
         </div>

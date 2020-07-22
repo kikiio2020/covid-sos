@@ -16,13 +16,9 @@ class CreateSosTable extends Migration
         Schema::create('sos', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->tinyInteger('type')->default(0);
             $table->string('description')->nullable();
-            $table->string('vendor_name')->nullable();
-            $table->string('vendor_address')->nullable();
-            $table->decimal('compensation', 4, 2)->nullable();
-            $table->tinyInteger('delivery_option')->default(0);
-            $table->tinyInteger('payment_option')->default(0);
-            $table->string('other_instruction')->nullable();
+            $table->string('detail_instructions')->nullable();
             $table->integer('created_by');
             $table->softDeletes();
             $table->timestamps();
