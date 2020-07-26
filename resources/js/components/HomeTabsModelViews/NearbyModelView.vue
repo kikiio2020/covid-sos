@@ -178,8 +178,11 @@ export default {
                             // An error occurred
                        	});
                     }).catch(error => {
-                        console.log(error);
-                        this.$root.$bvToast.toast('Pledging failed', {
+                        var errMsg = 'Pledging failed';
+                    	if ('request_expired' == error.response.data.message) {
+                        	errMsg = 'The SOS Request is expired'; 
+                        }
+                        this.$root.$bvToast.toast(errMsg, {
                             title: 'Pledging',
                             variant: 'danger',
                         });

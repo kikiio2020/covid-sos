@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Traits\ModelCacheTrait;
+use Carbon\Carbon;
+use App\Notifications\RequestExpired;
 
 class SosRequest extends Model 
 {
@@ -30,11 +32,29 @@ class SosRequest extends Model
         'chat' => '[]',
     ];
     
-    /*public function resolveRouteBinding($value, $field = null)
+    /**
+     * Go through all pending requests
+     * - send notification to requester for each outdated ones
+     * - log the outdated ones to be removed
+     * - remove the outdated ones from db
+     */
+    static public function expireOutdatedRequests()
     {
-        return $this->find($value);
-    }*/
+        SosRequest::pending()->each(function($sosRequest) {
+            if ($sosRequest->needed_by < Carbon::now()) {
+                $sosRequest->user->notify(new RequestExpired($sosRequest));
+                $logMsg = '[Request expired and removed]:' . $sosRequest->toJson();
+                \Log::channel('bookkeeping')->info($logMsg);
+                $sosRequest->delete();
+                echo "Found expired request {$sosRequest->id} and removed.\n";
+            }
+        });
+    }
     
+    /**
+     * Relations 
+     */
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -49,6 +69,10 @@ class SosRequest extends Model
     {
         return $this->belongsTo(Sos::class, 'sos_id');
     }
+    
+    /**
+     * Scopes
+     */
     
     public function scopeCreatedBy(Builder $query, User $user)
     {
@@ -74,6 +98,7 @@ class SosRequest extends Model
     {
         return $query->where('status', self::STATUS_COMPLETED);
     }
+    
     
     public function getNearbyReverseCache()
     {
@@ -109,4 +134,5 @@ class SosRequest extends Model
     {
         return $this->forgetCache(self::CACHE_KEY_NEARBY_REVERSE);
     }
+    
 }

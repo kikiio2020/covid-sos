@@ -3,15 +3,16 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\SosRequest;
 
-class RequestPledged extends Notification
+class RequestExpired extends Notification
 {
     use Queueable;
 
-    private $sosRequest;
+    private $sosRequest;    
     
     /**
      * Create a new notification instance.
@@ -43,17 +44,14 @@ class RequestPledged extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->greeting('Hi ' . $notifiable->getUserName())
-                    ->line('Good news!')
-                    ->line($this->sosRequest->responder->getUserName() . 
-                        'has responded to your request <' .
-                        $this->sosRequest->sos->name . 
-                        '> . You can start communicating with them by clicking the button below.'
-                    )
-                    ->action('Start Communication', url('sosRequest/' . $this->sosRequest->id . '/inProgress/'))
-                    ->line('Thank you for being part of our community!')
-                    ->line("Sincerely,")
-                    ->salutation(config('mail.notificationSignature'));
+        ->subject(config('mail.subjectPrefix') . 'Request <' . $this->sosRequest->sos->name . '> is Expired')
+        ->greeting('Hi ' . $notifiable->getUserName())
+        ->line('Unfortunately your request has expired without any taker.')
+        ->line($this->sosRequest->user->getUserName())
+        ->line('Please send out a new request for a new date')
+        ->line('Thank you for being part of our community!')
+        ->line("Sincerely,")
+        ->salutation(config('mail.notificationSignature'));
     }
 
     /**

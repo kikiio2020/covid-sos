@@ -71,7 +71,7 @@ class RequestNeedsApproval extends Notification
             ->action($this->sosRequest->sos->name, $url)
             ->line('Thank you for being part of our community!')
             ->line("Sincerely,")
-            ->salutation("Team " . config('app.name') . ' @ Kikiio');
+            ->salutation(config('mail.notificationSignature'));
     }
 
     /**

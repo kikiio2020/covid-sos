@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use App\Traits\ModelCacheTrait;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -189,6 +190,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ) AS distance'
         )
         ->where('sos_requests.status', SosRequest::STATUS_PENDING)
+        ->where('sos_requests.needed_by', '>', Carbon::now())
         ->whereRaw('
             ST_Distance_Sphere(
                 creator.longlat,

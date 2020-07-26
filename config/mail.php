@@ -98,5 +98,5 @@ return [
     ],
     
     'subjectPrefix' => '[' . env('APP_NAME') . ']: ',
-
+    'notificationSignature' => 'Team ' . env('APP_NAME') . ' @ Kikiio',
 ];

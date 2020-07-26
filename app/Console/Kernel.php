@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\Nearby;
+use App\SosRequest;
 
 class Kernel extends ConsoleKernel
 {
@@ -27,6 +28,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         //$schedule->command('nearby:cache')->dailyAt('3:00');
+        
+        $schedule->call(function() {
+            SosRequest::expireOutdatedRequests();
+        })->daily();
     }
 
     /**

@@ -50,7 +50,7 @@ class SosRequestController extends Controller
     
     public function pendingsView()
     {
-        return SosRequestResource::collection(auth()->user()->sosRequest()->pending()->get());
+        return SosRequestResource::collection(auth()->user()->sosRequest()->pending()->where('needed_by', '>', Carbon::now())->get());
     }
     
     public function historyView()
@@ -256,8 +256,14 @@ class SosRequestController extends Controller
         }
     }
     
-    public function pledge(int $sosRequestId): Response
+    public function pledge(SosRequest $sosRequest): Response
     {
+        $sosRequestId = $sosRequest->id;
+        if ($sosRequest->needed_by < Carbon::now()) {
+            $logMsg = '[Request expired]:' . $sosRequest->toJson();
+            \Log::channel('bookkeeping')->info($logMsg);
+            abort(Response::HTTP_BAD_REQUEST, 'request_expired');
+        }
         DB::transaction(function() use ($sosRequestId) {
             $sosRequest = DB::table('sos_requests')->where('id', '=', $sosRequestId)->sharedLock()->first();
             
