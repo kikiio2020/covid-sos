@@ -133,6 +133,7 @@ Route::get('webapi/person', function(){
 
 //Hujo Coin
 \Route::get('/hujoCoin', 'HomeController@hujoCoin')->name('hujocoin');
+\Route::get('/hujoPay/{sosRequest}', 'HomeController@hujoPay')->name('hujopay');
 \Route::ApiResources([
     '/webapi/hujoCoin' => 'Api\HujoCoinController',
 ]);

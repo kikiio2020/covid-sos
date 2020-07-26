@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Middleware\UnknownStatus;
 use App\SosRequest;
+use Illuminate\Http\Response;
 
 class HomeController extends Controller
 {
@@ -56,6 +57,23 @@ class HomeController extends Controller
     public function hujoCoin()
     {
         return view('hujocoin');
+    }
+    
+    public function hujoPay(SosRequest $sosRequest)
+    {
+        if ($sosRequest->user->id !== auth()->user()->id) {
+            //Not authorized
+            \abort(Response::HTTP_FORBIDDEN, "You cannot pay for this request");
+        }
+        
+        if ($sosRequest->status !== SosRequest::STATUS_IN_PROGRESS) {
+            //Request cannot be paid
+            \abort(Response::HTTP_BAD_REQUEST, "The request cannot be paid");
+        }
+        
+        return view('hujopay', [
+            'requestId' => $sosRequest->id,
+        ]);
     }
     
     public function sosRequestStandAloneInProgressView(SosRequest $sosRequest)

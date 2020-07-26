@@ -8,7 +8,9 @@ class HujoCoinTx extends Model
 {
     protected $fillable = [
         'user_id',
+        'recipient_id',
         'function',
+        'reference_id',
         'transaction_hash',
     ];
     

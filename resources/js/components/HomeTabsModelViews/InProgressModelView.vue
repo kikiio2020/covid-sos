@@ -156,12 +156,22 @@ export default {
         },
         completeRequest(row) {
         	const isResponder = this.userId == row.responded_by;
+        	
         	const confirmMsg = isResponder ? 
         			'Please confirm request from ' + row.requester + ' is completed: ' :
        				'Please confirm your request ' + row.sos_text + ' is completed: ';
+        
+        	//TODO if requestor, add to confirmMsg:
+        	// - if both requestor and responder are enrolled in hujo, say user will be redirected to hujoPay page to complete the process
+        	// - if either one is not, say nothing.
+        	
         	this.$bvModal.msgBoxConfirm(confirmMsg)
             .then(value => {
             	if (value) {
+            		
+            		//TODO redirect to hujoPay page if condition is satisfied.
+            		// otherwise continue as below.
+            		
             		axios.put('webapi/sosRequest/completeRequest/' + row.id)
             			.then((response) => {
             				this.$bvModal.msgBoxOk(

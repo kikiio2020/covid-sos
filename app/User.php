@@ -156,7 +156,6 @@ class User extends Authenticatable implements MustVerifyEmail
             'sos_requests.user_id',
             'sos_requests.sos_id',
             'sos_requests.needed_by',
-            'sos_requests.special_instruction',
             'sos_requests.status',
             'sos_requests.responded_by',
             'sos_requests.chat',

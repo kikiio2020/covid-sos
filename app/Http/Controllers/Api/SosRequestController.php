@@ -16,6 +16,7 @@ use App\Notifications\RequestPledged;
 use App\Http\Resources\HistoryView;
 use Illuminate\Database\Eloquent\Builder;
 use App\Notifications\RequestNeedsApproval;
+use App\HujoCoinTx;
 
 class SosRequestController extends Controller
 {
@@ -168,11 +169,40 @@ class SosRequestController extends Controller
      * @param int $sosRequestId
      * @return Response
      */
-    public function complete(int $sosRequestId): Response
+    public function complete(Request $request, SosRequest $sosRequest): Response
     {
+        \Validator::make($request->all(), [
+            'transaction_hash' => 'sometimes|required',
+        ])->validate();
+        
         $user = auth()->user();
         $userId = $user->id;
+        $sosRequestId = $sosRequest->id;        
         
+        /**
+         * Separate creating HujoCoinTx from DB::transaction because
+         * we don't want to lose the txId in case the DB::trasaction aborts
+         */
+        if ($request->txId) {
+            $hujoCoinTx = new HujoCoinTx();
+            $fillables = [
+                'user_id' => $userId,
+                'function' => 'transferFrom',
+                'reference_id' => $sosRequestId,
+                'transaction_hash' => $request->transaction_hash,
+            ];
+            if ($userId === $sosRequest->user_id) {
+                //only fill recepient_id when user is requester
+                $fillables['recipient_id'] = $sosRequest->responded_by;
+            }
+            $hujoCoinTx->fill($fillables);
+            $hujoCoinTx->save();
+            //TODO send tx notification to both users
+        }
+        
+        /**
+         * Update request status
+         */
         DB::transaction(function() use ($sosRequestId, $userId) {
             $sosRequest = DB::table('sos_requests')->where('id', '=', $sosRequestId)->sharedLock()->first();
             $values = [];
@@ -197,6 +227,9 @@ class SosRequestController extends Controller
             
         }, 5);
      
+        /**
+         * Send notification
+         */
         $sosRequest = SosRequest::find($sosRequestId);
         if (SosRequest::STATUS_COMPLETED === $sosRequest->status) {
             $user->notify(new RequestCompleted($sosRequest));

@@ -16,7 +16,9 @@ class CreateHujoCoinTxesTable extends Migration
         Schema::create('hujo_coin_txes', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
+            $table->integer('recipient_id')->nullable();
             $table->string('function');
+            $table->integer('reference_id')->nullable();
             $table->string('transaction_hash', 256)->unique();
             $table->timestamps();
         });

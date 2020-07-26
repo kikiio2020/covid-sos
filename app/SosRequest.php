@@ -20,7 +20,6 @@ class SosRequest extends Model
         'sos_id',
         'needed_by',
         'status',
-        'special_instruction',
         'responded_by',
         'chat',
         'user_approved',

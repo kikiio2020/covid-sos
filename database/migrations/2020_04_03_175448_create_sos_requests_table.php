@@ -19,7 +19,6 @@ class CreateSosRequestsTable extends Migration
             $table->integer('user_id');
             $table->integer('sos_id');
             $table->date('needed_by')->nullable();
-            $table->string('special_instruction')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('responded_by')->nullable();
             $table->json('chat');

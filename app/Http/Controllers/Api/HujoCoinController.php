@@ -45,6 +45,9 @@ class HujoCoinController extends Controller
         ));
         $hujoCoinTx->save();
         
+        //TODO send notification for enrollment and txID
+        
+        
         return response(new HujoCoinResource($hujoCoin), Response::HTTP_CREATED);
     }
 

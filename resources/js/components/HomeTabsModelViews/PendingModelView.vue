@@ -1,6 +1,5 @@
 <template>
     <div>
-    <test-sos-array></test-sos-array>
     <crud-control
         id="pending-model-view"
         ref="myModelView"

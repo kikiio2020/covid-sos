@@ -1,5 +1,5 @@
 <template>
-<button @click="send" :disabled="disabled && balance>0">{{caption}}</button>
+<button @click="send" :disabled="disabled || balance<=0">{{caption}}</button>
 </template>
 <script>
 import { createNamespacedHelpers } from 'vuex';
@@ -20,14 +20,16 @@ export default {
     	send: function () {
     		this.caption = 'Sending...';
     		this.disabled = true;
-    		this.hojo.methods.transferFrom(
+    		this.hujoCoin.methods.transferFrom(
    				this.accountAddress, this.to, 1
  			).send().then((result, error) => {
- 				this.caption = 'Pending';
  				console.log('result:');
    				console.log(result);
    				console.log('error:');
    				console.log(error);
+   				
+   				this.caption = 'Pending';
+   				this.$emit('sent', result);
    			}).catch((error) => {
    				console.log('got error:');
    				console.log(error);
@@ -41,22 +43,22 @@ export default {
     	...accountHelpers.mapGetters(['activeAccount']),
     	...contractHelpers.mapGetters(['getContractData']),
     	
-    	hojo: function() {
-        	return this.drizzleInstance.contracts.Hojo;
+    	hujoCoin: function() {
+        	return this.drizzleInstance.contracts.HujoCoin;
         },
         accountAddress: function() {
         	return this.activeAccount;
         },
         balance: function() {
         	return this.getContractData({
-        		contract: 'Hojo',
+        		contract: 'HujoCoin',
         		method: 'balanceOf',
         	});
         },
     },
     mounted() {
     	this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
-    		contractName: 'Hojo',
+    		contractName: 'HujoCoin',
     		method: 'balanceOf',
     		methodArgs: [this.accountAddress],
     	});
