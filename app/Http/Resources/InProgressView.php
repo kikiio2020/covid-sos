@@ -14,11 +14,10 @@ class InProgressView extends JsonResource
      */
     public function toArray($request)
     {
-        $askObjectArray = parent::toArray($request);
-        
+        $sosRequestObjectArray = parent::toArray($request);
         $userId = auth()->user()->id;
         
-        return array_merge($askObjectArray, [
+        return array_merge($sosRequestObjectArray, [
             'sos_text' => $this->resource->sos->name,
             'sos_description' => $this->resource->sos->description,
             'vendor' => $this->resource->sos->vendor,
@@ -34,7 +33,7 @@ class InProgressView extends JsonResource
                         'Yourself' :
                         $this->resource->responder->getUserName()
                 ) : '', 
-            'status_txt' => __('model.ask.status.' . $askObjectArray['status']),
+            'status_txt' => __('model.ask.status.' . $sosRequestObjectArray['status']),
         ]);
     }
 }

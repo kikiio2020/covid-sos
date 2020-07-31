@@ -17,7 +17,6 @@ class SosRequestsSeeder extends Seeder
                 'user_id' => 1,
                 'sos_id' => 1,
                 'needed_by' => '2020-04-30',
-                'special_instruction' => null,
                 'status' => SosRequest::STATUS_PENDING,
                 'chat' => '[]',
             ],

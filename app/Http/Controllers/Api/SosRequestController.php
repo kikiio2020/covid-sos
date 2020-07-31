@@ -17,6 +17,11 @@ use App\Http\Resources\HistoryView;
 use Illuminate\Database\Eloquent\Builder;
 use App\Notifications\RequestNeedsApproval;
 use App\HujoCoinTx;
+use App\Http\Resources\NearbyView;
+use App\Notifications\RequestRejected;
+use App\Notifications\RequestCancelled;
+use App\Notifications\RequestAccepted;
+use App\Notifications\PledgeCancelled;
 
 class SosRequestController extends Controller
 {
@@ -50,7 +55,12 @@ class SosRequestController extends Controller
     
     public function pendingsView()
     {
-        return SosRequestResource::collection(auth()->user()->sosRequest()->pending()->where('needed_by', '>', Carbon::now())->get());
+        return SosRequestResource::collection(
+            auth()->user()->sosRequest()->pending()->where('needed_by', '>', Carbon::now())->get()
+            ->merge(
+                auth()->user()->pledges()->pending()->where('needed_by', '>', Carbon::now())->get()
+            )
+        );
     }
     
     public function historyView()
@@ -67,23 +77,8 @@ class SosRequestController extends Controller
     public function nearbyView()
     {
         $result = auth()->user()->getNearbyResult();
-        $resultArray = array_map(
-            function($item){
-                //TODO Refactor to move to resource
-                $item->distance_km = round($item->distance / 1000, 2);
-                $item->creator = ($item->{'creator.name'} ?: $item->{'creator.email'}) . ' @ ' . $item->{'creator.address'};
-                //TODO add Hujo field
-                
-                return (array) $item;
-            }, 
-            $result->toArray()
-        );
         
-        //TODO Refactor to move to resource
-        return  [
-            'data' => $resultArray
-            
-        ];
+        return NearbyView::collection($result);
     }
     
     /**
@@ -274,7 +269,6 @@ class SosRequestController extends Controller
             
             $values = [
                 'responded_by' => auth()->user()->id,
-                'status' => SosRequest::STATUS_IN_PROGRESS,
             ];
             DB::table('sos_requests')->where('id', '=', $sosRequestId)->update($values);
         }, 5);
@@ -282,6 +276,126 @@ class SosRequestController extends Controller
         $sosRequest = SosRequest::find($sosRequestId);
         $sosRequest->user->notify(new RequestPledged($sosRequest));
         $this->clearNearbyCache($sosRequest);
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    public function accept(SosRequest $sosRequest): Response
+    {
+        if ($sosRequest->user->id !== auth()->user()->id) {
+            abort(Response::HTTP_FORBIDDEN, 'not_allowed');
+        }
+        if ($sosRequest->needed_by < Carbon::now()) {
+            $logMsg = 'Request expired and can\'t be accepted. [Request]:' . $sosRequest->toJson();
+            \Log::channel('bookkeeping')->info($logMsg);
+            abort(Response::HTTP_BAD_REQUEST, 'request_expired');
+        }
+        if ($sosRequest->user->hujoCoin() && $sosRequest->responder->hujoCoin()) {
+            $sosRequest->is_hujo = true;
+        }
+        $sosRequest->status = SosRequest::STATUS_IN_PROGRESS;
+        $sosRequest->save();
+        $sosRequest->user->notify(new RequestAccepted($sosRequest));
+        $sosRequest->responder->notify(new RequestAccepted($sosRequest));
+        
+        \Log::channel('bookkeeping')->info(
+            'Requestor[' . $sosRequest->user->id . ']'
+            . ' accepts help for '
+            . 'Request[' . $sosRequest->id . ']'
+            . ' from '
+            . 'Responder[' . $sosRequest->responder->id . ']'
+            );
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    /**
+     * @param SosRequest $sosRequest
+     * @return Response
+     */
+    public function reject(SosRequest $sosRequest): Response
+    {
+        if ($sosRequest->user->id !== auth()->user()->id) {
+            abort(Response::HTTP_FORBIDDEN, 'not_allowed');
+        }
+        if ($sosRequest->needed_by < Carbon::now()) {
+            $logMsg = 'Request expired and can\'t be rejected. [Request]:' . $sosRequest->toJson();
+            \Log::channel('bookkeeping')->info($logMsg);
+            abort(Response::HTTP_BAD_REQUEST, 'request_expired');
+        }
+        $sosRequest->responder->notify(new RequestRejected($sosRequest));
+        $sosRequest->is_hujo = false;
+        $sosRequest->responded_by = null;
+        $sosRequest->save();
+        
+        \Log::channel('bookkeeping')->info(
+            'Requestor[' . $sosRequest->user->id . ']'
+            . ' rejects help for '
+            . 'Request[' . $sosRequest->id . ']'
+            . ' from '
+            . 'Responder[' . $sosRequest->responder->id . ']'
+        );
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    /**
+     * @param SosRequest $sosRequest
+     * @return Response
+     */
+    public function cancelRequest(SosRequest $sosRequest): Response
+    {
+        if ($sosRequest->user->id !== auth()->user()->id) {
+            abort(Response::HTTP_FORBIDDEN, 'not_allowed');
+        }
+        
+        //Not yet pledged
+        if (!$sosRequest->responded_by) {
+            $logMsg = 'Requestor[' . $sosRequest->user->id . ']'
+                . ' cancels '
+                . 'Request[' . $sosRequest->id . ']'
+                . '[Request removed]:' . $sosRequest->toJson();
+            $sosRequest->delete();
+            $this->clearNearbyCache($sosRequest);
+            \Log::channel('bookkeeping')->info($logMsg);
+
+            return response('', Response::HTTP_OK);
+        }
+        
+        //Already pleged
+        $logMsg = 'Requestor[' . $sosRequest->user->id . ']'
+            . ' cancels '
+            . 'Request[' . $sosRequest->id . ']'
+            . ' pledged by '
+            . 'Responder[' . $sosRequest->responder->id . ']: '
+            . '[Request removed]:' . $sosRequest->toJson();
+        $sosRequest->responder->notify(new RequestCancelled($sosRequest));
+        $sosRequest->delete();
+        //No need to clear Nearby cache requests are removed from cache when pledged 
+        \Log::channel('bookkeeping')->info($logMsg);
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    public function cancelPledge(SosRequest $sosRequest): Response
+    {
+        if (!$sosRequest->responder 
+            || $sosRequest->responder->id !== auth()->user()->id
+        ) {
+            abort(Response::HTTP_FORBIDDEN, 'not_allowed');
+        }
+     
+        $logMsg = 'Responder[' . $sosRequest->responder->id . ']'
+            . ' cancels pledge to '
+            . 'Request[' . $sosRequest->id . ']'
+            . ' from '
+            . 'Requestor[' . $sosRequest->user->id . ']';
+        $sosRequest->user->notify(new PledgeCancelled($sosRequest));
+        $sosRequest->responded_by = null;
+        $sosRequest->is_hujo = false;
+        $sosRequest->save();
+        //Request will show up again on people's NearBy view the next day as their cache expires.
+        \Log::channel('bookkeeping')->info($logMsg);
         
         return response('', Response::HTTP_OK);
     }

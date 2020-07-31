@@ -191,6 +191,7 @@ class User extends Authenticatable implements MustVerifyEmail
         )
         ->where('sos_requests.status', SosRequest::STATUS_PENDING)
         ->where('sos_requests.needed_by', '>', Carbon::now())
+        ->whereNull('sos_requests.responded_by')
         ->whereRaw('
             ST_Distance_Sphere(
                 creator.longlat,

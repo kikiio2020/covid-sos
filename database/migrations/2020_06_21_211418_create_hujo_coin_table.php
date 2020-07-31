@@ -16,7 +16,7 @@ class CreateHujoCoinTable extends Migration
         Schema::create('hujo_coins', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unique();
-            $table->string('crypto_address', 256)->nullable()->unique();
+            $table->string('crypto_address', 256)->unique();
             $table->timestamps();
             $table->softDeletes();
         });

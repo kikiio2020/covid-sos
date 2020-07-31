@@ -30,6 +30,7 @@
                     <pending-model-view
                         :is-responder="isResponder"
                         ref="pendingModelView"
+                        @pendingPledgeAccepted="pledgeAccepted"
                     ></pending-model-view>
                 </b-tab>
                 <b-tab title="Manage my SOSs" lazy ref="sosView">
@@ -85,6 +86,9 @@ export default {
             })
         },
         newPledged:function () {
+        	this.$store.commit('setHomeTabIndex', homeTabIndex.pending);
+        },
+        pledgeAccepted:function () {
         	this.$store.commit('setHomeTabIndex', homeTabIndex.inProgress);
         },
     },

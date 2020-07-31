@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\SosRequest;
+use Carbon\Carbon;
 
 class RequestPledged extends Notification
 {
@@ -43,17 +44,30 @@ class RequestPledged extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->greeting('Hi ' . $notifiable->getUserName())
-                    ->line('Good news!')
-                    ->line($this->sosRequest->responder->getUserName() . 
-                        'has responded to your request <' .
-                        $this->sosRequest->sos->name . 
-                        '> . You can start communicating with them by clicking the button below.'
-                    )
-                    ->action('Start Communication', url('sosRequest/' . $this->sosRequest->id . '/inProgress/'))
-                    ->line('Thank you for being part of our community!')
-                    ->line("Sincerely,")
-                    ->salutation(config('mail.notificationSignature'));
+        ->subject(config('mail.subjectPrefix') . 'Request **' . $this->sosRequest->sos->name . '** Pledged')
+            ->greeting('Hi ' . $notifiable->getUserName())
+            ->line('Good news!')
+            ->line(
+                '**' . $this->sosRequest->responder->name . '**' 
+                . ' has pledged to help with your request ' 
+                . '**"' . $this->sosRequest->sos->name . '"**' 
+                . ' scheduled for '
+                . '**' . Carbon::parse($this->sosRequest->needed_by)->format('M d, Y') . '**'
+                . '. Please accept their help by clicking the button below. '
+                . (
+                    $notifiable->hujoCoin ? 
+                        'As both you and ' 
+                        . $this->sosRequest->responder->name
+                        . ' are both on the Hujo Coin network, you will be prompted to exchange one Hujo coin to ' 
+                        . $this->sosRequest->responder->name
+                        . ' when the task is completed.' 
+                    : ''
+                  )
+            )
+            ->action('Accept', url('sosRequest/' . $this->sosRequest->id . '/accept/'))
+            ->line('Thank you for being part of our community!')
+            ->line("Sincerely,")
+            ->salutation(config('mail.notificationSignature'));
     }
 
     /**

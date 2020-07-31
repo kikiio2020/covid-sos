@@ -76,6 +76,13 @@ class HomeController extends Controller
         ]);
     }
     
+    public function sosRequestStandAloneAccept(SosRequest $sosRequest)
+    {
+        return view('standalone.acceptpledge', [
+            'sosRequest' => $sosRequest
+        ]);
+    }
+    
     public function sosRequestStandAloneInProgressView(SosRequest $sosRequest)
     {
         return view('standalone.sosrequest', [

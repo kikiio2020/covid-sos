@@ -191,6 +191,8 @@ export default {
             });
         },
         cancelRequest(row) {
+        	//TODO Should In Progress requests allowed to be cancelled?
+        			
         	const confirmMsg = this.userId == row.responded_by ? 
         			'Are you sure you want to cancel your pledge to ' + row.requester + '?' :
        				'Are you sure you want to cancel your request for ' + row.sos_text + '?';

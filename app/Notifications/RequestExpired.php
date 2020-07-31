@@ -43,12 +43,23 @@ class RequestExpired extends Notification
      */
     public function toMail($notifiable)
     {
+        $isResponder = $notifiable->id === $this->sosRequest->responded_by;
+        
+        if ($isResponder) {
+            $line1 = 'The person whom you wanted to help for the following request has not responded.';
+            $line2 = 'The request is now expired and will be removed from the list';
+        } else {
+            $line1 = 'Unfortunately your request has expired without any taker.';
+            $line2 = 'You can send out a new request with a new date';
+        }
+        
+        
         return (new MailMessage)
         ->subject(config('mail.subjectPrefix') . 'Request <' . $this->sosRequest->sos->name . '> is Expired')
         ->greeting('Hi ' . $notifiable->getUserName())
-        ->line('Unfortunately your request has expired without any taker.')
+        ->line($line1)
         ->line($this->sosRequest->user->getUserName())
-        ->line('Please send out a new request for a new date')
+        ->line($line2)
         ->line('Thank you for being part of our community!')
         ->line("Sincerely,")
         ->salutation(config('mail.notificationSignature'));

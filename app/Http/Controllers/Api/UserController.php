@@ -2,13 +2,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cache;
-
 
 class UserController extends Controller
 {
@@ -137,11 +133,14 @@ class UserController extends Controller
     /**
      * @param Request $request
      * @return Response
+     * testing only
      */
+    /*
     public function flushCache(Request $request): Response
     {
         Cache::flush();
         
         return response('', Response::HTTP_OK);
     }
+    */
 }

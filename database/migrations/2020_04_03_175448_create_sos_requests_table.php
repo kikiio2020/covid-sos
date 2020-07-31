@@ -18,6 +18,7 @@ class CreateSosRequestsTable extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('sos_id');
+            $table->boolean('is_hujo')->default(false);
             $table->date('needed_by')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('responded_by')->nullable();

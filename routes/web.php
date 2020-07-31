@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\RequestStatusCanView;
 use App\SosRequest;
+use App\Http\Middleware\RequestOwnerOnly;
+use App\Http\Middleware\PledgedRequestOnly;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,11 +38,20 @@ use App\SosRequest;
 \Route::get('/setstatus', 'HomeController@setstatus')->name('setstatus');
 \Route::get('/profile', 'HomeController@profile')->name('profile');
 \Route::get('/shoplist', 'HomeController@shoplist')->name('shoplist');
+\Route::get('/sosRequest/{sosRequest}/accept', 'HomeController@sosRequestStandAloneAccept')
+    ->middleware(
+        [
+            RequestStatusCanView::class . ':' . SosRequest::STATUS_PENDING,
+            PledgedRequestOnly::class,
+            RequestOwnerOnly::class,        
+        ]
+    )
+    ->name('sosRequestStandAloneAccept');
 \Route::get('/sosRequest/{sosRequest}/inProgress', 'HomeController@sosRequestStandAloneInProgressView')
     ->middleware(RequestStatusCanView::class . ':' . SosRequest::STATUS_IN_PROGRESS)    
     ->name('sosRequestStandAloneInProgressView');
 \Route::get('/sosRequest/{sosRequest}/history', 'HomeController@sosRequestStandAloneHistoryView')
-->middleware(RequestStatusCanView::class . ':' . SosRequest::STATUS_COMPLETED)
+    ->middleware(RequestStatusCanView::class . ':' . SosRequest::STATUS_COMPLETED)
     ->name('sosRequestStandAloneHistoryView');
 
 //\Route::get('/webapi/users/', 'Api\UserController@show');
@@ -60,7 +71,7 @@ use App\SosRequest;
 ]);
 \Route::put('/webapi/user/updateHomeTabIndexCache', 'Api\UserController@updateHomeTabIndexCache');
 \Route::put('/webapi/user/removeHomeTabIndexCache', 'Api\UserController@removeHomeTabIndexCache');
-\Route::put('/webapi/user/flushCache', 'Api\UserController@flushCache');
+//\Route::put('/webapi/user/flushCache', 'Api\UserController@flushCache'); //testing only
 
 
 //Why this doesn't work???
@@ -100,6 +111,10 @@ Route::get('webapi/person', function(){
 \Route::get('webapi/sosRequest/historyView', 'Api\SosRequestController@historyView');
 \Route::get('webapi/sosRequest/nearbyView', 'Api\SosRequestController@nearbyView');
 \Route::put('webapi/sosRequest/pledgeRequest/{sosRequest}', 'Api\SosRequestController@pledge');
+\Route::put('webapi/sosRequest/cancelRequest/{sosRequest}', 'Api\SosRequestController@cancelRequest');
+\Route::put('webapi/sosRequest/acceptPledge/{sosRequest}', 'Api\SosRequestController@accept');
+\Route::put('webapi/sosRequest/rejectPledge/{sosRequest}', 'Api\SosRequestController@reject');
+\Route::put('webapi/sosRequest/cancelPledge/{sosRequest}', 'Api\SosRequestController@cancelPledge');
 \Route::put('webapi/sosRequest/completeRequest/{sosRequest}', 'Api\SosRequestController@complete');
 
 \Route::ApiResources([

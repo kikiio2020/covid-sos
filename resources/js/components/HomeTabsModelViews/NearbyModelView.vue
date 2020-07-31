@@ -153,13 +153,12 @@ export default {
                             responded_by: this.userId
                         }*/
                     ).then(response => {
-                        this.$root.$bvToast.toast('Pledge sent to user', {
+                        this.$root.$bvToast.toast('Pledge sent', {
                             title: 'Thank you!',
                             variant: 'success',
                         });
                         this.$bvModal.msgBoxOk(
-                            'Thanks for helping out! Your pledge will be sent to the user and you can start ' +
-                            'communicating the delivery details by going to the request Details in the "In Progress" tab.',
+                            'Thanks for helping out! Your pledge has been sent. Please wait for a response.',
                             {
                                 title: 'Pledge Sent',
                                 headerBgVariant: 'primary',
