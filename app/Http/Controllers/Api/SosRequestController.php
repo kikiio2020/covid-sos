@@ -22,6 +22,8 @@ use App\Notifications\RequestRejected;
 use App\Notifications\RequestCancelled;
 use App\Notifications\RequestAccepted;
 use App\Notifications\PledgeCancelled;
+use App\Notifications\HujoCoinExchanged;
+use App\Rules\Probably256Hex;
 
 class SosRequestController extends Controller
 {
@@ -167,23 +169,26 @@ class SosRequestController extends Controller
     public function complete(Request $request, SosRequest $sosRequest): Response
     {
         \Validator::make($request->all(), [
-            'transaction_hash' => 'sometimes|required',
+            'transaction_hash' => [
+                'exclude_unless:is_hujo,true',
+                'required',
+                new Probably256Hex(),
+            ]
         ])->validate();
         
-        $user = auth()->user();
-        $userId = $user->id;
+        $userId = auth()->user()->id;
         $sosRequestId = $sosRequest->id;        
         
         /**
          * Separate creating HujoCoinTx from DB::transaction because
-         * we don't want to lose the txId in case the DB::trasaction aborts
+         * we don't want to lose the transaction_hash in case the DB::trasaction aborts
          */
-        if ($request->txId) {
+        if ($request->transaction_hash) {
             $hujoCoinTx = new HujoCoinTx();
             $fillables = [
                 'user_id' => $userId,
                 'function' => 'transferFrom',
-                'reference_id' => $sosRequestId,
+                'reference_id' => $sosRequest->id,
                 'transaction_hash' => $request->transaction_hash,
             ];
             if ($userId === $sosRequest->user_id) {
@@ -192,7 +197,16 @@ class SosRequestController extends Controller
             }
             $hujoCoinTx->fill($fillables);
             $hujoCoinTx->save();
-            //TODO send tx notification to both users
+            $sosRequest->user->notify(new HujoCoinExchanged($sosRequest));
+            $sosRequest->responder->notify(new HujoCoinExchanged($sosRequest));
+            \Log::channel('bookkeeping')->info(
+                'Requestor[' . $sosRequest->user->id . ']'
+                . ' sent Hujo Coin to '
+                . 'Responder[' . $sosRequest->responder->id . ']'
+                . 'for completing '
+                . 'Request[' . $sosRequest->id . ']'
+                . 'Tx[' . $request->transaction_hash . ']'
+            );
         }
         
         /**
@@ -227,7 +241,7 @@ class SosRequestController extends Controller
          */
         $sosRequest = SosRequest::find($sosRequestId);
         if (SosRequest::STATUS_COMPLETED === $sosRequest->status) {
-            $user->notify(new RequestCompleted($sosRequest));
+            $sosRequest->user->notify(new RequestCompleted($sosRequest));
             $sosRequest->responder->notify(new RequestCompleted($sosRequest));
             
             return response('', Response::HTTP_OK);
@@ -259,7 +273,11 @@ class SosRequestController extends Controller
             \Log::channel('bookkeeping')->info($logMsg);
             abort(Response::HTTP_BAD_REQUEST, 'request_expired');
         }
-        DB::transaction(function() use ($sosRequestId) {
+        $isHujo = false;
+        if (auth()->user()->hujoCoin() && $sosRequest->user->hujoCoin()) {
+            $isHujo = true;
+        }
+        DB::transaction(function() use ($sosRequestId, $isHujo) {
             $sosRequest = DB::table('sos_requests')->where('id', '=', $sosRequestId)->sharedLock()->first();
             
             if ($sosRequest->responded_by) {
@@ -269,6 +287,7 @@ class SosRequestController extends Controller
             
             $values = [
                 'responded_by' => auth()->user()->id,
+                'is_hujo' => $isHujo,
             ];
             DB::table('sos_requests')->where('id', '=', $sosRequestId)->update($values);
         }, 5);
@@ -290,9 +309,6 @@ class SosRequestController extends Controller
             \Log::channel('bookkeeping')->info($logMsg);
             abort(Response::HTTP_BAD_REQUEST, 'request_expired');
         }
-        if ($sosRequest->user->hujoCoin() && $sosRequest->responder->hujoCoin()) {
-            $sosRequest->is_hujo = true;
-        }
         $sosRequest->status = SosRequest::STATUS_IN_PROGRESS;
         $sosRequest->save();
         $sosRequest->user->notify(new RequestAccepted($sosRequest));
@@ -310,8 +326,7 @@ class SosRequestController extends Controller
     }
     
     /**
-     * @param SosRequest $sosRequest
-     * @return Response
+     * Requestor rejects a pledge
      */
     public function reject(SosRequest $sosRequest): Response
     {
@@ -340,8 +355,7 @@ class SosRequestController extends Controller
     }
     
     /**
-     * @param SosRequest $sosRequest
-     * @return Response
+     * Requestor cancels a request
      */
     public function cancelRequest(SosRequest $sosRequest): Response
     {
@@ -377,6 +391,9 @@ class SosRequestController extends Controller
         return response('', Response::HTTP_OK);
     }
     
+    /**
+     * Responder cancels a pledge
+     */
     public function cancelPledge(SosRequest $sosRequest): Response
     {
         if (!$sosRequest->responder 

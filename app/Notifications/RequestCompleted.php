@@ -46,15 +46,15 @@ class RequestCompleted extends Notification
         
         $line = $isResponder ? 
             'Thank you being awesome! This is to confirm the request ' . 
-            '<' . $this->sosRequest->sos->name . '> for ' .
+            '**"' . $this->sosRequest->sos->name . '"** for ' .
             $this->sosRequest->user->getUserName() . 
             ' is now completed.'
             : 
             'This is to confirm your request "' . 
-            '<' . $this->sosRequest->sos->name . '> ' . 
+            '**"' . $this->sosRequest->sos->name . '"** ' . 
             '" is now completed.';
         
-        $subject = config('mail.subjectPrefix') . 'Request <' . $this->sosRequest->sos->name . '> Compeleted';
+        $subject = config('mail.subjectPrefix') . 'Request **"' . $this->sosRequest->sos->name . '"** Compeleted';
         
         $url = url('sosRequest/' . $this->sosRequest->id . '/history/');
         
@@ -63,7 +63,7 @@ class RequestCompleted extends Notification
             ->subject($subject)
             ->greeting('Hi ' . $notifiable->getUserName())
             ->line($line)
-            ->line('For you reference, you can click the button below to access the request. It will remain there for next month.')
+            ->line('For you reference, you can click the button below to access the request. It will remain there for the next month.')
             ->action($this->sosRequest->sos->name, $url)
             ->line('Thank you for being part of our community!')
             ->line("Sincerely,")

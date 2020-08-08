@@ -15,23 +15,6 @@
 					<div class="ml-5">{{ $sosRequest->needed_by }}</div>
 				</div>
 				
-				<div class="d-flex justify-content-left">
-					<div class="font-weight-bold">Delivery Option:</div>
-					<div class="ml-5">{{ __('model.sos.delivery_option.' . $sosRequest->sos->delivery_option) }}</div>
-				</div>
-				
-				<div class="d-flex justify-content-left">
-					<div class="font-weight-bold">Payment Option:</div>
-					<div class="ml-5">{{ __('model.sos.payment_option.' . $sosRequest->sos->payment_option) }}</div>
-				</div>
-				
-				@isset($sosRequest->sos->complensation)
-				<div class="d-flex justify-content-left">
-					<div class="font-weight-bold">Compensation:</div>
-					<div class="ml-5">${{ $sosRequest->sos->complensation }}</div>
-				</div>
-				@endisset
-
 				@if($sosRequest->sos->shoplistItem()->count())				
 				<div class="d-flex flex-column justify-content-left mt-3">
 						<b-button v-b-toggle.shoplist variant="primary">Shop list</b-button>					
@@ -69,13 +52,7 @@
 				</div>
 				@endif
 				
-				@isset($sosRequest->special_instruction)
-				<div class="d-flex justify-content-left">
-					<div class="font-weight-bold">Special Instruction:</div>
-					<div class="ml-5">{{ $sosRequest->special_instruction }}</div>
-				</div>
-				@endisset
-				
+				<!-- 
 				<b-card 
     				class="mt-3 mb-3"
     				title-tag="h6"
@@ -94,7 +71,8 @@
                       	</b-collapse>
     				</div>
 				</b-card>
-				
+				 -->
+				 
 				<div class="d-flex flex-column mt-5 mb-5 justify-content-center">
 					Communication Log:
 					<chat-log chat="{{ $sosRequest->chat }}"></chat-log>

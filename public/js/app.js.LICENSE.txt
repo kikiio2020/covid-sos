@@ -1,7 +1,7 @@
 /*!
-  * Bootstrap v4.5.0 (https://getbootstrap.com/)
+  * Bootstrap v4.5.2 (https://getbootstrap.com/)
   * Copyright 2011-2020 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
 
 /*!
@@ -21,7 +21,7 @@
  */
 
 /*!
- * BootstrapVue Icons, generated from Bootstrap Icons 1.0.0-alpha4
+ * BootstrapVue Icons, generated from Bootstrap Icons 1.0.0-alpha5
  *
  * @link https://icons.getbootstrap.com/
  * @license MIT
@@ -88,7 +88,7 @@
   */
 
 /**
-  * vee-validate v3.3.7
+  * vee-validate v3.3.8
   * (c) 2020 Abdelrahman Awad
   * @license MIT
   */

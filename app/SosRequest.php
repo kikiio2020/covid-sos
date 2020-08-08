@@ -70,6 +70,11 @@ class SosRequest extends Model
         return $this->belongsTo(Sos::class, 'sos_id');
     }
     
+    public function hujoCoinTx()
+    {
+        return $this->hasOne(HujoCoinTx::class, 'reference_id');
+    }
+    
     /**
      * Scopes
      */

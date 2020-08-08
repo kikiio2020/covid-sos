@@ -10,10 +10,6 @@
                 name: '', 
                 description: '',
                 needed_by: new Date(),
-                vendor_name: '',
-                vendor_address: '',
-                delivery_option: null,
-                payment_option: null,
             }"
             :grid-fields="[
                 {
@@ -25,11 +21,12 @@
                     sortable: true,
                 },
                 {
-                	key: 'type', 
-                    sortable: true,
+                	key: 'creator.name',
+                	label: 'Sender',
+                	sortable: true,
                 },
                 {
-                    key: 'hujo', 
+                	key: 'type', 
                     sortable: true,
                 },
                 {
@@ -126,8 +123,10 @@ export default {
     },
     methods: {
         pledgeRequest(request) {
-            this.$bvModal.msgBoxConfirm(
-                'Make a pledge to ' + request.creator + '?', 
+            const confirmMsg = 'Make a pledge to "' + request.name + '" for ' + request['creator.name'] + '?';
+            const hujoConfirmMsg = (request.hujo ? ' You will receive one Hujo Coin at completion.' : '');
+        	this.$bvModal.msgBoxConfirm(
+                confirmMsg + hujoConfirmMsg, 
                 {
                     title: 'Confirm Pledge',
                     headerBgVariant: 'primary',

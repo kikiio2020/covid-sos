@@ -179,8 +179,16 @@ export default {
 	            });
         },
 		acceptPledge: function(row) {
-			const confirmMsg = 'Please confirm you are accepting the pledge from ' + row.responder_name + ':';
-        	this.$bvModal.msgBoxConfirm(confirmMsg)
+			const confirmMsg = 'Accept the pledge from ' 
+				+ row.responder_name 
+				+ ' for '
+				+ '"' + row.sos_text + '" ?';
+			const hujoConfirmMsg = (
+					row.hujo_responder 
+					? ' You will be prompted to exchange one Hujo coin on completion.'
+					: ''
+				);
+        	this.$bvModal.msgBoxConfirm(confirmMsg + hujoConfirmMsg)
 	            .then(value => {
 	            	if (value) {
 	            		axios.put('webapi/sosRequest/acceptPledge/' + row.id)

@@ -13,9 +13,19 @@ class HujoCoin extends Model
         'user_id',
         'crypto_address',
     ];
+
+    /**
+     * Relations 
+     */
     
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    
+    public function hujoCoinTx()
+    {
+        return $this->hasOne(HujoCoinTx::class, 'reference_id');
+    }
+    
 }

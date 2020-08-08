@@ -61,19 +61,11 @@ class HomeController extends Controller
     
     public function hujoPay(SosRequest $sosRequest)
     {
-        if ($sosRequest->user->id !== auth()->user()->id) {
-            //Not authorized
-            \abort(Response::HTTP_FORBIDDEN, "You cannot pay for this request");
+        if ($sosRequest->user_approved) {
+            abort(Response::HTTP_FORBIDDEN, 'Oops! Looks like you have already completed this request.');
         }
         
-        if ($sosRequest->status !== SosRequest::STATUS_IN_PROGRESS) {
-            //Request cannot be paid
-            \abort(Response::HTTP_BAD_REQUEST, "The request cannot be paid");
-        }
-        
-        return view('hujopay', [
-            'requestId' => $sosRequest->id,
-        ]);
+        return view('hujopay', ['sosRequest' => $sosRequest]);
     }
     
     public function sosRequestStandAloneAccept(SosRequest $sosRequest)

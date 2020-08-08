@@ -16,9 +16,11 @@
 				<div class="d-flex justify-content-center">
 					<div>
 						You are about to send one Hujo Coin to 
-						<span class="font-bold">...</span>
-						to complete the request 
-						<span class="font-bold">...</span>.
+						<span class="font-weight-bold">{{ responderName }}</span>
+						in order to complete the request 
+						<span class="font-weight-bold">"{{ requestName }}"</span>
+						scheduled for
+						<span class="font-weight-bold">{{ neededbyDate }}</span>
 					</div>
 				</div>
 			</b-card>
@@ -37,12 +39,12 @@
 				>
 					<b-card-text>
 						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">Hujo Coin Balance:</span> 
+							<span class="font-weight-bold pr-md-2">Current Hujo Coin Balance:</span> 
 							<hujo-balance></hujo-balance>
 						</div>
 					</b-card-text>
 					
-					<b-card-text>
+					<b-card-text v-if="txId">
 						<div class="d-flex justify-content">
 							<span class="font-weight-bold pr-md-2">Transaction ID:</span> 
 							<div>
@@ -64,8 +66,11 @@
 					    </b-toast>
 						<hujo-send 
 							v-if="isDrizzleInitialized"
-							class="btn btn-success" 
-							@sent="txSent"
+							class="btn btn-success"
+							:to="hujoCoinRecipient.crypto_address" 
+							@sending="onTxSending"
+							@sent="onTxSent"
+							@errored="onTxErrored"
 						></hujo-send>
 						<button
 							v-else
@@ -98,7 +103,11 @@
 					header="Info"
 				>
 					<b-card-text align="center">
-						<div>Please start and logon to MetaMask...</div>
+						<div align="left">
+							<div>Please start and logon to MetaMask on your browser.</div>
+							<div>Ensure you have selected the Ethereum mainnet,</div>
+							<div>and the digital wallet that you have used to enroll Hujo Coin.</div>
+						</div>
 						<div class="m-5"><b-spinner></b-spinner></div>
 					</b-card-text>
 				</b-card>
@@ -125,17 +134,25 @@ export default {
     },
     props: {
         requestId: 0,
-    	user: {},
+        requestName: '',
+        responderName: '',
+        neededbyDate:'',
     	hujoCoin: {}, 
+    	hujoCoinRecipient: {},
     },
     data() {
         return {
-       		//txSent: false,
        		txId: '',
         }
     },
     methods: { 
-        txSent(event) {
+    	onTxSending(event) {
+        	axios.put('/webapi/hujoCoin/logEvent', {
+        		event: 'txSending',
+        		...event	
+        	});
+        },
+    	onTxSent(event) {
         	console.log('txSent');
         	console.log(event);
         	
@@ -144,8 +161,22 @@ export default {
         		'transaction_hash': event.transactionHash,
         	}).then(response => {
         		this.bvToast.show('txSentSuccess');
+        		this.$root.$bvToast.toast('Success', {
+                    title: 'Send Hujo Coin',
+                    variant: 'success',
+                });	
+        	}).catch(error => {
+        		this.$root.$bvToast.toast('Action failed.', {
+                    title: 'Send Hujo Coin',
+                    variant: 'danger',
+                });	
         	});
-        	//this.txSent = true;
+        },
+        onTxErrored(event){
+        	axios.put('/webapi/hujoCoin/logEvent', {
+        		event: 'txErrored',
+        		...event	
+        	});
         },
         copyTxId() {
         	this.$refs.txIdBox.select();

@@ -22,6 +22,13 @@ export default {
     methods: {
     	join: function () {
     		this.caption = 'Processing...';
+    		this.$emit('sending', {
+    			func: 'mintEnrol',
+    			account: this.activeAccount,
+    			roundedLong: Math.round(this.roundedLong), 
+    			roundedLat: Math.round(this.roundedLat),
+    			value: this.enrolCost,
+    		});
     		this.disabled = true;
     		this.hujoCoin.methods.mintEnrol(
     			Math.round(this.roundedLong), Math.round(this.roundedLat)
@@ -33,7 +40,7 @@ export default {
    				console.log('error:');
    				console.log(error);
    				
-   				this.caption = 'Pending';
+   				this.caption = 'Sent';
    				this.$emit('sent', result);
    			}).catch((error) => {
    				console.log('got error:');

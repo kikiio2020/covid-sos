@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             $this->call(SosSeeder::class);
             $this->call(SosRequestsSeeder::class);
             $this->call(ItemsTableSeeder::class);
-            $this->call(HujoCoinsTableSeeder::class);
+            //$this->call(HujoCoinsTableSeeder::class);
         }
     }
 }

@@ -148,7 +148,13 @@ Route::get('webapi/person', function(){
 
 //Hujo Coin
 \Route::get('/hujoCoin', 'HomeController@hujoCoin')->name('hujocoin');
-\Route::get('/hujoPay/{sosRequest}', 'HomeController@hujoPay')->name('hujopay');
+\Route::get('/hujoPay/{sosRequest}', 'HomeController@hujoPay')
+    ->middleware([
+        RequestStatusCanView::class . ':' . SosRequest::STATUS_IN_PROGRESS,
+        RequestOwnerOnly::class,
+    ])
+    ->name('hujopay');
+\Route::put('/webapi/hujoCoin/logEvent', 'Api\HujoCoinController@logEvent');
 \Route::ApiResources([
     '/webapi/hujoCoin' => 'Api\HujoCoinController',
 ]);

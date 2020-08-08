@@ -156,28 +156,28 @@ export default {
         },
         completeRequest(row) {
         	const isResponder = this.userId == row.responded_by;
-        	
         	const confirmMsg = isResponder ? 
-        			'Please confirm request from ' + row.requester + ' is completed: ' :
-       				'Please confirm your request ' + row.sos_text + ' is completed: ';
-        
-        	//TODO if requestor, add to confirmMsg:
-        	// - if both requestor and responder are enrolled in hujo, say user will be redirected to hujoPay page to complete the process
-        	// - if either one is not, say nothing.
+        			'Please confirm request from ' + row.requester + ' is completed.' :
+       				'Please confirm your request "' + row.sos_text + '" is completed.'
+       				+ (row.is_hujo ? ' (You will be redirected to the Hujo exchange page.)' : '');
         	
         	this.$bvModal.msgBoxConfirm(confirmMsg)
             .then(value => {
             	if (value) {
+            		if (!isResponder && row.is_hujo) {
+            			//Is Requestor and both party enrolled in Hujo
+            			window.location.href = '/hujoPay/' + row.id;
+            			
+            			return;
+            		}
             		
-            		//TODO redirect to hujoPay page if condition is satisfied.
-            		// otherwise continue as below.
-            		
+            		//Is responder or either party is enrolled to Hujo
             		axios.put('webapi/sosRequest/completeRequest/' + row.id)
             			.then((response) => {
             				this.$bvModal.msgBoxOk(
            						isResponder ? 
-           							'Thank you so much for helping out! We appreciate you being our community! Once the requestor has also signed off this request will be moved to the History tab. It will remain accessible there for one month. Thank you!':
-          							'Thank you for confirming! We will notify your helper and will move this task to the History tab once everyone has approved. It will remain there for one month. Thank you!'
+           							'Thanks so much for helping out! We appreciate you being part of our community! Once everyone has signed off this request it will be moved to the History tab and will remain accessible for the next month.':
+          							'Thanks for confirming! Once everyone has signed off this request it will be moved to the History tab and will remain accessible for the next month.'
          					);
             				this.$refs.myModelView.loadData();
             			}).catch((error) => {

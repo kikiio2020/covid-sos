@@ -177,12 +177,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'sos.updated_at',
             
             'creator.email as creator.email',
-            'creator.name as creator.name',
+            //'creator.name as creator.name',
             'creator.address as creator.address',
             
-            \DB::raw('if(hujo_coins.id > 0, "Y", "N") as hujo'),            
+            \DB::raw('if(hujo_coins.id > 0, "Y", "N") as hujo'),
+            \DB::raw('if(hujo_coins.id > 0, CONCAT(creator.name, " (Hujo)"), creator.name) AS `creator.name`'),
         ])
-        //TODO also calculate delivery distance
         ->selectRaw(
             'ST_Distance_Sphere(
                 creator.longlat,

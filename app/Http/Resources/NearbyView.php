@@ -17,7 +17,7 @@ class NearbyView extends JsonResource
         return array_merge((array) $this->resource, [
             'distance_km' => round($this->resource->distance / 1000, 2),
             'creator' => $this->resource->{'creator.name'} . ' @ ' . $this->resource->{'creator.address'},
-            'type' => __('model.sos.type.' . $this->resource->status),
+            'type' => __('model.sos.type.' . $this->resource->type),
         ]);
     }
 }

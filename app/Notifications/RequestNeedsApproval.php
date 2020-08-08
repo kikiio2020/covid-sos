@@ -45,20 +45,20 @@ class RequestNeedsApproval extends Notification
         $isResponder = $notifiable->id === $this->sosRequest->responded_by;
         
         if ($isResponder) {
-            $line1 = $this->sosRequest->user->getUserName() . ' ' .
+            $line1 = '**' . $this->sosRequest->user->getUserName() . '** ' .
                 'has indicated the work for their request ' .
-                '<' . $this->sosRequest->sos->name . '> is now completed. Thanks!';
+                '**"' . $this->sosRequest->sos->name . '"** is now completed. Thanks!';
             $line2 = 'Please confirm and close the request by following the link below' .
                 'to the request and click the \'Complete\' button.';
         } else {
-            $line1 = 'Good news! ' . $this->sosRequest->responder->getUserName() . ' ' .
+            $line1 = 'Good news! **' . $this->sosRequest->responder->getUserName() . '** ' .
                 'has now completed the work for your request ' .
-                '<' . $this->sosRequest->sos->name . '> ';
+                '**"' . $this->sosRequest->sos->name . '"** ';
             $line2 = 'Please follow the link below to the request and click the ' .
                 '\'Complete\' button to confirm and close the request.';
         }
         
-        $subject = config('mail.subjectPrefix') . 'Re: Request <' . $this->sosRequest->sos->name . '>';
+        $subject = config('mail.subjectPrefix') . 'Re: Request **"' . $this->sosRequest->sos->name . '"**';
         
         $url = url('sosRequest/' . $this->sosRequest->id . '/inProgress/');
         

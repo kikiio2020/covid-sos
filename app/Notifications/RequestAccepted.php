@@ -76,7 +76,7 @@ class RequestAccepted extends Notification
             if ($isHujo) {
                 $line2 = 'As both you and ' 
                     . $this->sosRequest->responder->name
-                    . ' are on the Hujo Coin network, you will be prompted to exchange one Hujo Coin to '
+                    . ' are on the Hujo Coin network, you will be prompted to exchange one Hujo Coin with '
                     . $this->sosRequest->responder->name 
                     . ' at the completion of the request.';
             }
@@ -95,7 +95,6 @@ class RequestAccepted extends Notification
             ->salutation(config('mail.notificationSignature'));
         
         return $mailMessage;
-        
     }
 
     /**

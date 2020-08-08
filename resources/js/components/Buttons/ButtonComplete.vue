@@ -31,7 +31,15 @@ export default {
 	                           	});
 	                  			this.text = 'Completed';
 	                  			this.variant = 'secondary';
-	                  		})	
+	                  		})
+	                  		.catch(error => {
+	                  			this.$root.$bvToast.toast('Action failed.', {
+			                        title: 'Complete Request',
+			                        variant: 'danger',
+			                    });
+	                  			this.disabled = false;
+	    	       				this.text = 'Complete';
+			        		})
 	       			} else {
 	       				this.disabled = false;
 	       				this.text = 'Complete';

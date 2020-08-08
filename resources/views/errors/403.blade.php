@@ -6,7 +6,7 @@
     <div class="m-5">
 		@if (empty($exception->getMessage())) 
 			Oops! An Error Occurred <br>
-			The server returned a "400 Bad Request".
+			The server returned a "403 Forbidden".
 		@else
 			{{ $exception->getMessage() }}
 		@endif

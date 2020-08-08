@@ -21,10 +21,15 @@ const files = require.context('./components/', true, /\.vue$/i);
 files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 //Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+//app.blade
+Vue.component('welcome-alert', require('../components/AlertMessages/WelcomeAlert.vue').default);
+Vue.component('hujo-enrol-invite', require('../components/AlertMessages/HujoEnrolInvite.vue').default);
+//hujo coin
 Vue.component('hujo-enrol', require('../components/VendorKiki/HujoCoin/HujoEnrol.vue').default);
 Vue.component('hujo-topup', require('../components/VendorKiki/HujoCoin/HujoTopup.vue').default);
 Vue.component('hujo-balance', require('../components/VendorKiki/HujoCoin/HujoBalance.vue').default);
 Vue.component('hujo-topup-cost', require('../components/VendorKiki/HujoCoin/HujoTopupCost.vue').default);
+Vue.component('hujo-send', require('../components/VendorKiki/HujoCoin/HujoSend.vue').default);
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);

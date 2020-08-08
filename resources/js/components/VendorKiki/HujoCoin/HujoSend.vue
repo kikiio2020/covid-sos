@@ -12,12 +12,19 @@ export default {
     props: ['to'],
     data() {
     	return {
-    		caption: 'Send',
+    		caption: 'Send One Hujo Coin',
     		disabled: false,
     	} 
     },
     methods: {
     	send: function () {
+    		this.$emit('sending', {
+    			func: 'transferFrom',
+    			account: this.activeAccount,
+    			from: this.accountAddress, 
+    			to: this.to, 
+    			token: 1,
+    		});
     		this.caption = 'Sending...';
     		this.disabled = true;
     		this.hujoCoin.methods.transferFrom(
@@ -28,13 +35,14 @@ export default {
    				console.log('error:');
    				console.log(error);
    				
-   				this.caption = 'Pending';
+   				this.caption = 'Sent';
    				this.$emit('sent', result);
    			}).catch((error) => {
    				console.log('got error:');
    				console.log(error);
    				this.disabled = false;
-   				this.caption = 'Send';   				
+   				this.caption = 'Send';
+   				this.$emit('errored', error);
    			});
     	},
     },

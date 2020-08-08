@@ -9,6 +9,11 @@ use Illuminate\Http\Response;
 
 class ShowAlertMessageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:web');
+    }
+    
     /**
      * Display a listing of the resource.
      *

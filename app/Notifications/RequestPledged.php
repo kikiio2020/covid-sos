@@ -58,7 +58,7 @@ class RequestPledged extends Notification
                     $notifiable->hujoCoin ? 
                         'As both you and ' 
                         . $this->sosRequest->responder->name
-                        . ' are both on the Hujo Coin network, you will be prompted to exchange one Hujo coin to ' 
+                        . ' are on the Hujo Coin network, you will be prompted to exchange one Hujo coin with ' 
                         . $this->sosRequest->responder->name
                         . ' when the task is completed.' 
                     : ''

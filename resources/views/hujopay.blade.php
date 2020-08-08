@@ -6,8 +6,11 @@
 
 @section('content')
 <hujo-pay
-	:request-id="{{ $requestId }}"
-	:user="{{Auth()->user()}}"
+	:request-id="{{ $sosRequest->id }}"
+	request-name="{{ $sosRequest->sos->name }}"
+	responder-name="{{ $sosRequest->responder->name }}"
+	neededby-date="{{ Carbon\Carbon::parse($sosRequest->needed_by)->format('M d, Y') }}"
 	:hujo-coin="{{Auth()->user()->hujoCoin->toJson()}}"
+	:hujo-coin-recipient="{{$sosRequest->responder->hujoCoin->toJson()}}"
 ></hujo-pay>
 @endsection

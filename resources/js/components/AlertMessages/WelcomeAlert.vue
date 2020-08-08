@@ -34,6 +34,9 @@ export default {
     	axios.get('/webapi/user/showAlertCache/show_welcome').then((response) => {
             this.cachedToShow = response.data.data.show; 
         }).catch((error) => {
+        	if (401 == error.response.status) {
+        		this.cachedToShow = false;
+        	}
         });
     }
 }

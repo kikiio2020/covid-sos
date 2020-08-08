@@ -23,7 +23,6 @@ export default {
         		contract: 'HujoCoin',
         		method: 'balanceOf',
         	});
-        	
         }
     },
     mounted() {

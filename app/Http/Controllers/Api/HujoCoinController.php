@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\HujoCoin;
 use App\HujoCoinTx;
 use Illuminate\Http\Response;
+use App\Rules\Probably256Hex;
+use App\Notifications\HujoCoinEnrolled;
 
 class HujoCoinController extends Controller
 {
@@ -31,8 +33,11 @@ class HujoCoinController extends Controller
     {
         \Validator::make($request->all(), [
             'user_id' => 'required',
-            'crypto_address' => 'required',
-            'transaction_hash' => 'required',
+            'crypto_address' => 'required|unique:App\HujoCoin',
+            'transaction_hash' => [
+                'required',
+                new Probably256Hex(),
+            ],
         ])->validate();
         
         $hujoCoin = new HujoCoin();
@@ -40,13 +45,22 @@ class HujoCoinController extends Controller
         $hujoCoin->save();
         $hujoCoinTx = new HujoCoinTx();
         $hujoCoinTx->fill(array_merge(
-            ['function' => 'mintEnrol'],
+            [
+                'function' => 'mintEnrol',
+                'reference_id' => $hujoCoin->id,
+            ],
             $request->all()
         ));
         $hujoCoinTx->save();
         
-        //TODO send notification for enrollment and txID
+        $request->user()->notify(new HujoCoinEnrolled($hujoCoin));
         
+        \Log::channel('bookkeeping')->info(
+            'User[' . $request->user()->id . ']'
+            . ' enrols Hujo Coin:'
+            . ' Tx[' . $request->transaction_hash . ']'
+            . ' Wallet[' . $request->crypto_address . ']'
+        );
         
         return response(new HujoCoinResource($hujoCoin), Response::HTTP_CREATED);
     }
@@ -83,5 +97,15 @@ class HujoCoinController extends Controller
     public function destroy($id)
     {
         //
+    }
+    
+    public function logEvent(Request $request)
+    {
+        \Log::channel('bookkeeping')->info(
+            '[HujoCoin event]: '
+            . json_encode($request->all())
+        );
+        
+        return response([], Response::HTTP_OK);
     }
 }

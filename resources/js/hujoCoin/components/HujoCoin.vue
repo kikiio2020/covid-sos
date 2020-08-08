@@ -18,7 +18,7 @@
 						Hujo Coin is a community coin that is based on your locale. 
 						You can exchange with anyone within approximately 100km of your home. You may purchase Hujo 
 						coin with Ethereum crypto currency via the MetaMask browser plugin. It is less than a few 
-						bucks US to start. You can <b-button variant="primary" size="sm" href="/aboutHujoCoin">Read More</b-button> about the coin here.
+						bucks US to start. You can <a href="/aboutHujoCoin">Read More</a> about the coin here.
 					</div>
 				</div>
 			</b-card>
@@ -27,9 +27,9 @@
 		<b-card-text>
 			<div class="d-flex justify-content-center">
 				
-				<!-- User with registered wallet -->
+				<!-- User with registered wallet and did not just clicked 'Enroll' -->
 				<b-card
-					v-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address==activeAccount"
+					v-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address==activeAccount && lastTransactionDate > 0 && !enrolSent && !processing"
 					style="max-width: 60rem;"
 					border-variant="secondary"
 			        header="Your Hujo Coin account:"
@@ -93,6 +93,22 @@
 					
 				</b-card>
 
+				<!-- User is not enrolled and did not just clicked 'Enroll' but has a wallet ID already registered -->
+				<b-card
+					v-else-if="isDrizzleInitialized && !hujoCoin.id && lastTransactionDate > 0 && !enrolSent && !processing"
+					style="max-width: 60rem;"
+					border-variant="danger"
+			        header="Error"
+			        header-border-variant="danger"
+			        header-text-variant="danger"
+				>
+					<b-card-text>
+						Looks like you might be using someone else's MetaMask account. 
+						You must have your own unique one to register.
+						Please change your MetaMask account and refresh this page. 
+					</b-card-text>
+				</b-card>
+				
 				<!-- User with incorrect wallet ID -->
 				<b-card
 					v-else-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address!=activeAccount"
@@ -152,7 +168,7 @@
 								<div class="pr-md-2"><h4><b-badge pill variant="success">3</b-badge></h4></div>
 								<div>
 									When ready, go ahead and click the 'Enrol' button to purchase your first batch of Hujo Coins with your Ethereum. 
-									Follow the instructions on your MetaMask plugin. When successful you will see your new 10 coins balance shows up.
+									Follow the instructions on your MetaMask plugin.
 								</div>
 							</div>
 							<h4>
@@ -169,7 +185,9 @@
 							:roundedLat="longLat.latitude"
 							class="btn btn-success" 
 							:disabled="!isDrizzleInitialized || activeBalance<=0"
-							@sent="enrolSent"
+							@sending="onEnrolSending"
+							@sent="onEnrolSent"
+							@errored="onEnrolErrored"
 						></hujo-enrol>
 						<button
 							v-else
@@ -177,6 +195,30 @@
 							disabled=true
 						>Enroll</button>
 					</b-card-text>
+					
+					<b-card
+						v-if="enrolSent || processing"
+						class="card-align-center mx-5 mb-5"
+						header="Enrollment Sent"
+						header-bg-variant="primary"
+						header-text-variant="white"
+						bg-variant="light"
+					>
+						<b-card-text>
+							<div class="d-flex justify-content-between">
+								<div v-if="enrolSent" class="d-flex justify-content-start pr-md-2">
+									<div >
+										Done! Come back to this page later and you will see your new Hujo Coin balance shows up.
+									</div>
+								</div>
+								<div v-else class="d-flex justify-content-center pr-md-2">
+									<div><b-spinner></b-spinner></div>
+								</div>
+								
+							</div>
+						</b-card-text>
+					</b-card>
+					
 				</b-card>
 				
 				<!-- Waiting for Drizzle to start / user sign on to MetaMask -->
@@ -187,7 +229,12 @@
 					header="Info"
 				>
 					<b-card-text align="center">
-						<div>Please start and logon to MetaMask...</div>
+						<div align="left">
+							<div>Please start and logon to MetaMask on your browser.</div>
+							<div>Ensure you have selected the Ethereum mainnet,</div>
+							<div>and the digital wallet that you have used to enroll Hujo Coin.</div>
+							<div>Refresh this page when you are ready.</div>
+						</div>
 						<div class="m-5"><b-spinner></b-spinner></div>
 					</b-card-text>
 				</b-card>
@@ -229,10 +276,18 @@ export default {
     data() {
         return {
        		enrolSent: false,
+       		processing: false,
         }
     },
     methods: { 
-        enrolSent(event) {
+        onEnrolSending(event) {
+        	axios.put('webapi/hujoCoin/logEvent', {
+        		event: 'enrolSending',
+        		...event	
+        	});
+        },
+    	onEnrolSent(event) {
+        	this.processing = true;
         	console.log('enrolSent');
         	console.log(event);
         	
@@ -240,8 +295,27 @@ export default {
         		'user_id': this.user.id,
         		'crypto_address': this.activeAccount,
         		'transaction_hash': event.transactionHash,
-        	});
-        	this.enrolSent = true;
+        	}).then(response => {
+        		this.enrolSent = true;
+        		this.processing = false;
+        		this.$root.$bvToast.toast('Success', {
+                    title: 'Hujo Coin Enrollment',
+                    variant: 'success',
+                });	
+        	}).catch(error => {
+        		this.processing = false;
+        		this.$root.$bvToast.toast('Action failed.', {
+                    title: 'Hujo Coin Enrollment',
+                    variant: 'danger',
+                });	
+    		});
+        	
+        },
+        onEnrolErrored(event){
+        	this.$root.$bvToast.toast('An error has occured while enrolling. Please try refreshing your browser.', {
+                title: 'Hujo Coin Enrollment',
+                variant: 'danger',
+            });
         },
         topupSent(event) {
         	console.log('topupSent');
@@ -268,10 +342,26 @@ export default {
     	enrollmentDate: function() {
     		const date = new Date(this.hujoCoin.created_at);
     		
-    		return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getDate(); 
-    	}
+    		return date.getFullYear() 
+    			+ '-' + ('0' + (date.getMonth() + 1)).slice(-2) 
+    			+ '-' + ('0' + (date.getDate())).slice(-2); 
+    	},
+    	lastTransactionDate: function() {
+        	return this.getContractData({
+        		contract: 'HujoCoin',
+        		method: 'getLastTransactionDate',
+        	});
+        },
     },
     mounted() {
+    	
+    	console.log(this.hujoCoin);
+    	
+    	this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
+    		contractName: 'HujoCoin',
+    		method: 'getLastTransactionDate',
+    		methodArgs: '',
+    	});
     }
 }
 </script>
