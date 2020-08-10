@@ -24,12 +24,14 @@ use App\Notifications\RequestAccepted;
 use App\Notifications\PledgeCancelled;
 use App\Notifications\HujoCoinExchanged;
 use App\Rules\Probably256Hex;
+use App\Http\Middleware\LimitSosRequestsPerUser;
 
 class SosRequestController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:web');
+        $this->middleware(LimitSosRequestsPerUser::class . ':5')->only('store');
     }
     
     /**

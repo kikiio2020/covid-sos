@@ -38,7 +38,10 @@
         @cancelRequest="cancelRequest"
         @acceptPledge="acceptPledge"
         @rejectPledge="rejectPledge"
-        
+        @record-load-failed="onSosRequestBackendFailed"
+        @record-create-failed="onSosRequestCreateFailed"
+        @record-update-failed="onSosRequestBackendFailed"
+        @record-remove-failed="onSosRequestBackendFailed"
     ></crud-control>
     </div>
 </template>
@@ -91,7 +94,7 @@ export default {
         }
     },
     methods: {
-        insertModel(target, modalRecordData) {
+    	insertModel(target, modalRecordData) {
             this.$refs.myModelView.insertModel(target, modalRecordData);
         },
         onSave() {
@@ -266,6 +269,22 @@ export default {
 	                //console.log(err);
 	            });
         },
+        onSosRequestCreateFailed(error) {
+    		const errMsg = {
+    			max_sos_request_reached : 'You have exceeded the maximum number of opened SOS Requests.',
+    		}[error.response.data.message] 
+    		
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'Create SOS Requests',
+                variant: 'danger',
+            });
+    	},
+    	onSosRequestBackendFailed(error) {
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'Pending SOS Requests',
+                variant: 'danger',
+            });
+    	}, 
     },
     computed: {
     	sosArray: function() {

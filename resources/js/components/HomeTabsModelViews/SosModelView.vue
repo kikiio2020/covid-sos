@@ -63,6 +63,10 @@
         @async-returns="actionCompletes"
         @record-created="reloadSosArray"
         @record-removed="reloadSosArray"
+        @record-load-failed="onSosRequestBackendFailed"
+        @record-create-failed="onSosRequestBackendFailed"
+        @record-update-failed="onSosRequestBackendFailed"
+        @record-remove-failed="onSosRequestBackendFailed"
     ></model-view-2>
     
     </b-col></b-row>
@@ -163,7 +167,13 @@ export default {
         },
         reloadSosArray: function() {
         	this.$store.dispatch('loadSosArray');
-        }
+        },
+        onSosRequestBackendFailed(error) {
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'SOS',
+                variant: 'danger',
+            });
+    	},
     },
     computed: {
     },

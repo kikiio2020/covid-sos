@@ -78,6 +78,10 @@
 	        @completeRequest="completeRequest"
 	        @cancelRequest="cancelRequest"
 	        @openFullView="openFullView"
+	        @record-load-failed="onSosRequestBackendFailed"
+	        @record-create-failed="onSosRequestBackendFailed"
+	        @record-update-failed="onSosRequestBackendFailed"
+	        @record-remove-failed="onSosRequestBackendFailed"
 	    >
 	    	<!-- :user-name="userName" -->
 	    </crud-control>
@@ -209,6 +213,12 @@ export default {
         openFullView(data) {
         	window.open('/sosRequest/' + data.id + '/inProgress', '_blank');
         },
+        onSosRequestBackendFailed(error) {
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'In Progress SOS Requests',
+                variant: 'danger',
+            });
+    	},
     },
     computed: {},
     mounted() {

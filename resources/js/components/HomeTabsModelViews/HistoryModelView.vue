@@ -54,6 +54,10 @@
         gridUrlQuery="/historyView"
         :insertable="false"
         @openFullView="openFullView"
+        @record-load-failed="onSosRequestBackendFailed"
+        @record-create-failed="onSosRequestBackendFailed"
+        @record-update-failed="onSosRequestBackendFailed"
+        @record-remove-failed="onSosRequestBackendFailed"
     >
     </crud-control>
 </template>
@@ -132,6 +136,12 @@ export default {
     	openFullView(data) {
         	window.open('/sosRequest/' + data.id + '/history', '_blank');
         },
+        onSosRequestBackendFailed(error) {
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'SOS Requests',
+                variant: 'danger',
+            });
+    	}, 
     },
     computed: {},
     mounted() {

@@ -262,12 +262,14 @@ export default {
                     this.$emit('record-removed', id);
                     this.$emit('async-returns', id);
                 }).catch((error) => {
-                    console.log(error);
+                    /*
                     this.$root.$bvToast.toast('Remove ' + this.tableName + ' failed', {
                         title: 'Remove ' + this.tableName,
                         variant: 'danger',
                     });
                     this.$emit('record-remove-failed', id);
+                    */
+                    this.$emit('record-remove-failed', error);
                     this.$emit('async-returns', id);
                 });
         },
@@ -355,14 +357,16 @@ export default {
                     this.editModalRecord.id = response.data.id;
                     this.editModalNew = false;
                 }).catch((error) => {
-                    console.log(error);
                     this.saving=false;
+                    /*
                     this.$root.$bvToast.toast(failMessage, {
                         title: toasterTitle,
                         variant: 'danger',
                     });
                     this.$emit(failEvent, this.editModalRecord.id);
-                    this.$emit('async-returns', response.data.id);
+                    */
+                    this.$emit(failEvent, error);
+                    this.$emit('async-returns', this.editModalRecord.id);
                 });
         },
         resetEditModal() {
@@ -384,13 +388,15 @@ export default {
                 this.items = response.data.data;
                 this.$root.$emit('bv::refresh::table', 'grid-table');
             }).catch(error => {
-                console.log(error);
                 this.tableBusy = false;
                 this.items;
+                /*
                 this.$root.$bvToast.toast('Error loading table', {
                     title: 'Loading ' + this.tableName,
                     variant: 'danger',
                 });
+                */
+                this.$emit('record-load-failed', error);
             });
         },
         getPreviewImageSrc (modalField, id) {

@@ -53,7 +53,11 @@
             gridUrlQuery="/nearbyView"
             :insertable="false"
             :table-properties="tableProperties"
-			@pledgeRequest="pledgeRequest"            
+			@pledgeRequest="pledgeRequest"     
+			@record-load-failed="onSosRequestBackendFailed"
+	        @record-create-failed="onSosRequestBackendFailed"
+	        @record-update-failed="onSosRequestBackendFailed"
+	        @record-remove-failed="onSosRequestBackendFailed"       
         >
         </crud-control>
     </b-col></b-row>
@@ -190,6 +194,12 @@ export default {
                 // An error occurred
             })
         },
+        onSosRequestBackendFailed(error) {
+    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+                title: 'Nearby SOS Requests',
+                variant: 'danger',
+            });
+    	},
     },
     computed: {
         rowsSelected: function() {
