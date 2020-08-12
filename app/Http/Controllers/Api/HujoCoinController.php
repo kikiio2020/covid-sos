@@ -10,6 +10,8 @@ use App\HujoCoinTx;
 use Illuminate\Http\Response;
 use App\Rules\Probably256Hex;
 use App\Notifications\HujoCoinEnrolled;
+use App\Notifications\HujoCoinWithdrawn;
+use App\Notifications\HujoCoinReinstated;
 
 class HujoCoinController extends Controller
 {
@@ -107,5 +109,65 @@ class HujoCoinController extends Controller
         );
         
         return response([], Response::HTTP_OK);
+    }
+    
+    /**
+     * Unenroll Hujo
+     * - soft delete Hujo record
+     * - send notification
+     * 
+     * @param Request $request
+     */
+    public function withdraw(Request $request)
+    {
+        \Validator::make($request->all(), [
+            'hujoBalance' => 'required|numeric',
+            'enrollmentDate' => 'required|Date',
+            'lastTransactionDateUnix' => 'required|numeric',
+        ])->validate();
+        
+        $hujo = $request->user()->hujoCoin()->first();
+        $hujo->delete();
+        
+        \Log::channel('bookkeeping')->info(
+            'User[' . $request->user()->id . ']'
+            . ' Withdrawn from Hujo Coin:'
+            . ' Balance[' . $request->hujoBalance . ']'
+            . ' enrollmentDate[' . $request->enrollmentDate . ']'
+            . ' lastTransactionDate[' . $request->lastTransactionDate . ']'
+            );
+        $request->user()->notify(new HujoCoinWithdrawn(
+            $request->hujoBalance ,
+            $request->enrollmentDate,
+            date('Y-m-d', $request->lastTransactionDateUnix)
+        ));
+        
+        return response('', Response::HTTP_OK);
+    }
+    
+    public function reinstate(Request $request)
+    {
+        \Validator::make($request->all(), [
+            'withdrawnHujoCoinId' => 'required|numeric',
+        ])->validate();
+        
+        $hujoCoin = HujoCoin::withTrashed()->find($request->withdrawnHujoCoinId);
+        if (!$hujoCoin) {
+            abort(Response::HTTP_BAD_REQUEST, 'Not Registered.');
+        }
+        
+        $hujoCoin->restore();
+        
+        \Log::channel('bookkeeping')->info(
+            'User[' . $request->user()->id . ']'
+            . ' Reinstated Hujo Coin:'
+            . ' Balance[' . $request->hujoBalance . ']'
+            . ' enrollmentDate[' . $request->enrollmentDate . ']'
+            . ' lastTransactionDate[' . $request->lastTransactionDate . ']'
+        );
+        
+        $request->user()->notify(new HujoCoinReinstated($hujoCoin));
+        
+        return response('', Response::HTTP_OK);
     }
 }

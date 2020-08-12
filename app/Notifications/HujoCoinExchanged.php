@@ -45,7 +45,6 @@ class HujoCoinExchanged extends Notification
     public function toMail($notifiable)
     {
         $isResponder = $notifiable->id === $this->sosRequest->responded_by;
-        $isHujo = $this->sosRequest->is_hujo;
         $hujoTxHash = $this->sosRequest->hujoCoinTx->transaction_hash;
         
         $line2 = '';
@@ -59,7 +58,7 @@ class HujoCoinExchanged extends Notification
                 . '**' . Carbon::parse($this->sosRequest->needed_by)->format('M d, Y') . '**'
                 . '. You will see the coin added to your balance momentarily. '
                 . 'Please keep the following transaction ID for future reference: ';
-                $line2 = '**' . $hujoTxHash . '**';
+            $line2 = '**' . $hujoTxHash . '**';
         } else {
             //Requestor
             $line =
@@ -70,7 +69,7 @@ class HujoCoinExchanged extends Notification
                 . ' scheduled for '
                 . '**' . Carbon::parse($this->sosRequest->needed_by)->format('M d, Y') . '**'
                 . '. Please keep the following transaction ID for future reference: ';
-                $line2 = '**' . $hujoTxHash . '**';
+            $line2 = '**' . $hujoTxHash . '**';
         }
         
         $mailMessage = (new MailMessage)

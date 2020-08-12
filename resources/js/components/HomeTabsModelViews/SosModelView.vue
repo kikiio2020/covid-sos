@@ -169,7 +169,7 @@ export default {
         	this.$store.dispatch('loadSosArray');
         },
         onSosRequestBackendFailed(error) {
-    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+    		this.$root.$bvToast.toast(error.response.data.message, {
                 title: 'SOS',
                 variant: 'danger',
             });

@@ -26,58 +26,85 @@
 		
 		<b-card-text>
 			<div class="d-flex justify-content-center">
-				
 				<!-- User with registered wallet and did not just clicked 'Enroll' -->
 				<b-card
-					v-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address==activeAccount && lastTransactionDate > 0 && !enrolSent && !processing"
+					v-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address==activeAccount && lastTransactionDateUnix > 0 && !enrolSent && !processing"
 					style="max-width: 60rem;"
 					border-variant="secondary"
 			        header="Your Hujo Coin account:"
 			        header-border-variant="secondary"
 				>
-					<b-card-text>
-						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">Cryptocurrency Wallet:</span> 
-							<div>
-								<input type="text" ref="walletIdBox" readonly :value="activeAccount">
-								<b-icon-files @click="copyWalletId"></b-icon-files>
+					<b-card
+						v-if="hujoCoin.deleted_at"
+						style="max-width: 60rem;"
+						border-variant="warning"
+				        header="Withdrawn"
+				        header-text-variant="white"
+				        header-bg-variant="warning"
+				        header-border-variant="secondary"
+				        align="center"
+				        class="m-5"
+					>
+						<b-card-text align=center>
+							<div class="d-flex align-items-start flex-column">
+								<div class="p-2">You are no longer in the Hujo Coin program, but you are welcome to join us again!</div>
+								<div class="p-2">Your previous balance will be restored minus any idle and annual fee since the time you were last here.</div> 
+							</div>
+						</b-card-text>
+					</b-card>
+					
+					<b-card-text align=center>
+						<div class="d-flex align-items-center flex-column">
+							<div class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">Cryptocurrency Wallet:</span> 
+								<div>
+									<input type="text" ref="walletIdBox" readonly :value="activeAccount">
+									<b-icon-files @click="copyWalletId"></b-icon-files>
+								</div>
+							</div>
+							<div class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">Cryptocurrency Balance:</span> 
+								<span>{{activeBalanceEth}} ETH</span>
+							</div>
+							<div class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">Hujo Coin Balance:</span> 
+								<hujo-balance></hujo-balance>
+							</div>
+							<div v-if="!hujoCoin.deleted_at" class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">
+									Hujo Coin Topup Amount:
+								</span> 
+								<hujo-topup-cost></hujo-topup-cost>
+							</div>
+							<div v-if="!hujoCoin.deleted_at"  class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">
+									Hujo Coin Topup Amount:
+								</span> 
+								<hujo-topup-cost></hujo-topup-cost>
+							</div>
+							<div class="d-flex p-2">
+								<span class="font-weight-bold pr-md-2">Enrollment Anniversary:</span> 
+								<span>{{enrollmentDate}}</span>
 							</div>
 						</div>
 					</b-card-text>
 					
-					<b-card-text>
-						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">Cryptocurrency Balance:</span> 
-							<span>{{activeBalanceEth}} ETH</span>
-						</div>
+					<b-card-text v-if="hujoCoin.deleted_at" align=center>
+						<b-toast id="reinstateSuccessToast" title="Reinstate" variant="primary" static no-auto-hide align=center>
+					      	Reinstate Successful! Welcome back! You're now part of the Hujo Coin community again!
+					      	Please refresh this page to see full account details again.  
+					    </b-toast>
+						<button
+							class="btn btn-success m-3"
+							@click="reinstate"
+							:disabled="reinstateProcessing || reinstateProcessed"
+						>{{ reinstateBtnCaption }}</button>
 					</b-card-text>
 					
-					<b-card-text>
-						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">Hujo Coin Balance:</span> 
-							<hujo-balance></hujo-balance>
-						</div>
-					</b-card-text>
-					
-					<b-card-text>
-						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">
-								Hujo Coin Topup Amount:
-							</span> 
-							<hujo-topup-cost></hujo-topup-cost>
-						</div>
-					</b-card-text>
-					
-					<b-card-text>
-						<div class="d-flex justify-content">
-							<span class="font-weight-bold pr-md-2">Enrollment Anniversary:</span> 
-							<span>{{enrollmentDate}}</span>
-						</div>
-					</b-card-text>
-					
-					<b-card-text align=center>
+					<b-card-text v-if="!hujoCoin.deleted_at" align=center>
+						<!-- If Drizzle not ready or user just clicked Withdraw Program -->
 						<hujo-topup 
-							v-if="isDrizzleInitialized"
+							v-if="isDrizzleInitialized && !withdrawProcessed"
 							class="btn btn-success" 
 							@sent="topupSent"
 						></hujo-topup>
@@ -91,11 +118,22 @@
 						></b-icon-info-circle> 
 					</b-card-text>
 					
+					<b-card-text v-if="!hujoCoin.deleted_at" align=center>
+						<b-toast id="withdrawSuccessToast" title="Withdrawn" variant="primary" static no-auto-hide align=center>
+					      	Withdraw Successful. We're sorry to see you leave, but you can come back anytime!  
+					      	Your previous balance will be restored minus any idle and annual fee since the time you were last here.
+					    </b-toast>
+						<button
+							class="btn btn-outline-dark"
+							:disabled="withdrawProcessing || withdrawProcessed"
+							@click="withdrawProgram"
+						>{{ withdrawBtnCaption }}</button>
+					</b-card-text>
 				</b-card>
 
 				<!-- User is not enrolled and did not just clicked 'Enroll' but has a wallet ID already registered -->
 				<b-card
-					v-else-if="isDrizzleInitialized && !hujoCoin.id && lastTransactionDate > 0 && !enrolSent && !processing"
+					v-else-if="isDrizzleInitialized && !hujoCoin.id && lastTransactionDateUnix > 0 && !enrolSent && !processing"
 					style="max-width: 60rem;"
 					border-variant="danger"
 			        header="Error"
@@ -277,6 +315,12 @@ export default {
         return {
        		enrolSent: false,
        		processing: false,
+       		withdrawBtnCaption: 'Withdraw Program',
+       		withdrawProcessing: false,
+       		withdrawProcessed: false,
+       		reinstateBtnCaption: 'Re-join',
+       		reinstateProcessing: false,
+       		reinstateProcessed: false,
         }
     },
     methods: { 
@@ -330,7 +374,96 @@ export default {
         copyWalletId() {
         	this.$refs.walletIdBox.select();
         	document.execCommand("copy");
-        }
+        },
+        withdrawProgram() {
+        	this.withdrawProcessing = true;
+        	this.$bvModal.msgBoxConfirm(
+            	'Are you sure to withdraw your Hujo Coin enrollment?', 
+                {
+                    title: 'Hujo Coin Enrollment',
+                    headerBgVariant: 'warning',
+                    headerTextVariant: 'white',
+                    size: 'sm',
+                    buttonSize: 'sm',
+                    okVariant: 'warning',
+                    okTitle: 'YES',
+                    cancelVariant: 'secondary',
+                    cancelTitle: 'NO',
+                    footerClass: 'p-2',
+                    hideHeaderClose: false,
+                    centered: true
+                }).then(confirm => {
+                	this.withdrawProcessing = true;
+                	this.withdrawBtnCaption = 'Processing...';
+                	if (confirm) {
+                		axios.put('/webapi/hujoCoin/withdraw', {
+                			hujoBalance: this.hujoBalance,
+                			enrollmentDate: this.enrollmentDate,
+                			lastTransactionDateUnix: this.lastTransactionDateUnix,
+                		}).then(response => {
+                			this.$bvToast.show('withdrawSuccessToast');
+                			this.withdrawBtnCaption = 'Withdrawn';
+                			this.withdrawProcessed = true;
+                		}).catch(error => {
+                			this.withdrawProcessing = false;
+                    		this.withdrawBtnCaption = 'Withdraw Program';
+                			this.$bvToast.toast(error.response.data.message ? error.response.data.message : 'Server Error', {
+                                title: 'Hujo Coin',
+                                variant: 'danger',
+                            });
+                		})
+                	} else {
+                		this.withdrawProcessing = false;
+                		this.withdrawBtnCaption = 'Withdraw Program';
+                	}
+                }).catch(err => {
+                    // An error occurred
+                	this.withdrawProcessing = false;
+                	this.withdrawBtnCaption = 'Withdraw Program';
+                })
+        },
+        reinstate() {
+        	this.$bvModal.msgBoxConfirm(
+                    'Please confirm you are re-joining?', 
+                    {
+                        title: 'Hujo Coin Enrollment',
+                        headerBgVariant: 'primary',
+                        headerTextVariant: 'white',
+                        size: 'sm',
+                        buttonSize: 'sm',
+                        okVariant: 'primary',
+                        okTitle: 'YES',
+                        cancelVariant: 'secondary',
+                        cancelTitle: 'NO',
+                        footerClass: 'p-2',
+                        hideHeaderClose: false,
+                        centered: true
+                    }
+                ).then(confirm => {
+                	if (confirm) {
+                		this.$bvToast.show('reinstateSuccessToast');
+                		this.reinstateProcessing = true;
+                		this.reinstateBtnCaption = 'Processing...';
+                		
+                		axios.put('/webapi/hujoCoin/reinstate', {
+                			withdrawnHujoCoinId: this.hujoCoin.id,
+                		}).then(response => {
+                			this.reinstateProcessing = false;
+                			this.reinstateProcessed = true;
+                    		this.reinstateBtnCaption = 'Reinstated';
+                		}).catch(error => {
+                			this.reinstateProcessing = false;
+                    		this.reinstateBtnCaption = 'Re-join';
+                    		this.$bvToast.toast(error.response.data.message ? error.response.data.message : 'Server Error', {
+                                title: 'Hujo Coin',
+                                variant: 'danger',
+                            });
+                		});
+                	}
+                }).catch(err => {
+                    // An error occurred
+                })
+        },
     },
     computed: {
     	...drizzleHelpers.mapGetters(['isDrizzleInitialized']),
@@ -339,6 +472,12 @@ export default {
     	activeBalanceEth: function() {
     		return (this.activeBalance * 0.000000000000000001).toPrecision(4);
     	},
+    	hujoBalance: function() {
+        	return this.getContractData({
+        		contract: 'HujoCoin',
+        		method: 'balanceOf',
+        	});
+        },
     	enrollmentDate: function() {
     		const date = new Date(this.hujoCoin.created_at);
     		
@@ -346,17 +485,17 @@ export default {
     			+ '-' + ('0' + (date.getMonth() + 1)).slice(-2) 
     			+ '-' + ('0' + (date.getDate())).slice(-2); 
     	},
-    	lastTransactionDate: function() {
+    	lastTransactionDateUnix: function() {
         	return this.getContractData({
         		contract: 'HujoCoin',
         		method: 'getLastTransactionDate',
         	});
+        	
+        	
+        	
         },
     },
     mounted() {
-    	
-    	console.log(this.hujoCoin);
-    	
     	this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
     		contractName: 'HujoCoin',
     		method: 'getLastTransactionDate',

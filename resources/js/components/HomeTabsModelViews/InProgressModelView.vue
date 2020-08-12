@@ -214,7 +214,7 @@ export default {
         	window.open('/sosRequest/' + data.id + '/inProgress', '_blank');
         },
         onSosRequestBackendFailed(error) {
-    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+    		this.$root.$bvToast.toast(error.response.data.message, {
                 title: 'In Progress SOS Requests',
                 variant: 'danger',
             });

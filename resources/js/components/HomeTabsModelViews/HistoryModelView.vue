@@ -137,7 +137,7 @@ export default {
         	window.open('/sosRequest/' + data.id + '/history', '_blank');
         },
         onSosRequestBackendFailed(error) {
-    		this.$root.$bvToast.toast(errMsg ? errMsg : error.response.data.message, {
+    		this.$root.$bvToast.toast(error.response.data.message, {
                 title: 'SOS Requests',
                 variant: 'danger',
             });

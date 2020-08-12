@@ -55,7 +55,7 @@
 					</b-card-text>
 					
 					<b-card-text align=center>
-						<b-toast id="txSentSuccess" title="OK" variabe="success" static no-auto-hide>
+						<b-toast id="txSentSuccess" title="OK" variant="success" static no-auto-hide>
 					      	Transaction is sent. Your helper will receive the coin momentarily. Please copy the transaction ID above for future reference.
 					      	
 					      	<!-- 
@@ -160,7 +160,7 @@ export default {
         	axios.put('/webapi/sosRequest/completeRequest/' + this.requestId, {
         		'transaction_hash': event.transactionHash,
         	}).then(response => {
-        		this.bvToast.show('txSentSuccess');
+        		this.$bvToast.show('txSentSuccess');
         		this.$root.$bvToast.toast('Success', {
                     title: 'Send Hujo Coin',
                     variant: 'success',

@@ -7,7 +7,7 @@
 @section('content')
 <hujo-coin
 	:user="{{Auth()->user()}}"
-	:hujo-coin="{{Auth()->user()->hujoCoin->toJson()}}"
+	:hujo-coin="{{Auth()->user()->hujoCoin()->withTrashed()->first()->toJson()}}"
 	:long-lat="{{json_encode(Auth()->user()->getLongLat())}}"
 ></hujo-coin>
 @endsection

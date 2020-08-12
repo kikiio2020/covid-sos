@@ -155,6 +155,8 @@ Route::get('webapi/person', function(){
     ])
     ->name('hujopay');
 \Route::put('/webapi/hujoCoin/logEvent', 'Api\HujoCoinController@logEvent');
+\Route::put('/webapi/hujoCoin/withdraw', 'Api\HujoCoinController@withdraw');
+\Route::put('/webapi/hujoCoin/reinstate', 'Api\HujoCoinController@reinstate');
 \Route::ApiResources([
     '/webapi/hujoCoin' => 'Api\HujoCoinController',
 ]);

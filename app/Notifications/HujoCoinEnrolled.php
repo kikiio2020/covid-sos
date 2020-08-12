@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\HujoCoin;
+use Illuminate\Support\HtmlString;
 
 class HujoCoinEnrolled extends Notification
 {
@@ -53,12 +54,12 @@ class HujoCoinEnrolled extends Notification
         ->line(
             'For your record please keep this transaction ID for future reference.'
         )
-        ->line(
+        ->line(new HtmlString(
             'Transaction ID: '
-            . '**' . $this->hujoCoin->hujoCoinTx->transaction_hash . '**  '
+            . '**' . $this->hujoCoin->hujoCoinTx->transaction_hash . '**<br>'
             . 'Wallet ID: '
-            . '**' . $this->hujoCoin->crypto_address . '**'
-        )
+            . '**' . $this->hujoCoin->crypto_address . '**<br>'
+        ))
         ->line('Thank you for being part of our community!')
         ->line("Sincerely,")
         ->salutation(config('mail.notificationSignature'));
