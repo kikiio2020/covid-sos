@@ -8,7 +8,6 @@
             id: 0, 
             sos_id: null,
             needed_by: null,
-            special_instruction: '',
         }"
         :grid-fields="[
             {
@@ -182,28 +181,36 @@ export default {
 	            });
         },
 		acceptPledge: function(row) {
-			const confirmMsg = 'Accept the pledge from ' 
+			const confirmMsg = 'Accept pledge from ' 
 				+ row.responder_name 
 				+ ' for '
 				+ '"' + row.sos_text + '" ?';
+			/*
 			const hujoConfirmMsg = (
 					row.hujo_responder 
 					? ' You will be prompted to exchange one Hujo coin on completion.'
 					: ''
 				);
+			*/
+			const hujoConfirmMsg = ''; //TODO clean up
         	this.$bvModal.msgBoxConfirm(confirmMsg + hujoConfirmMsg)
 	            .then(value => {
 	            	if (value) {
-	            		axios.put('webapi/sosRequest/acceptPledge/' + row.id)
+	            		if (row.hujo_responder) {
+	            			window.location.href = '/hujoAcceptPledge/' + row.id;
+	            			
+	            			return;
+	            		} 
+            			axios.put('webapi/sosRequest/acceptPledge/' + row.id)
             			.then((response) => {
             				this.$root.$bvToast.toast('Pledge Accepted', {
                                 title: 'Success',
                                 variant: 'success',
                             });
             				this.$bvModal.msgBoxOk(
-	                            'Thanks for confirming! You can start communicating with ' 
+	                            'Thanks! We will notify ' 
 	                            + row.responder_name 
-	                            + ' by going to the request Details in "In Progress" tab.',
+	                            + ' and you can start the communication by going to the Request Details in "In Progress" tab.',
 	                            {
 	                                title: 'Pledge Accepted',
 	                                headerBgVariant: 'primary',
@@ -222,7 +229,7 @@ export default {
                                 title: 'Accept Pledge',
                                 variant: 'danger',
                             });
-                       	});
+                       	});	
 	            	}
 	            })
 	            .catch(err => {
@@ -328,14 +335,6 @@ export default {
                     max: maxNeededByDate,
                     locale: 'en-US',
                     labelHelp: '',
-                },
-                {
-                    fieldType: "b-form-textarea",
-                    caption: "Special Instructions",
-                    placeholder: "Special Instructions",
-                    name: "special_instruction",
-                    id: "special_instruction",
-                    class: "my-3 mr-3",
                 },
             ];
     	}

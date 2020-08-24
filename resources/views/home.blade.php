@@ -16,6 +16,7 @@
         <div class="col-md-12">
         	<home
         		:is-responder="{{ auth()->user()->status == \App\User::STATUS_RESPONDER ? 'true' : 'false' }}"
+        		:is-hujo="{{ auth()->user()->loadCount('hujoCoin')->hujo_coin_count }}"
         		user-id="{{ auth()->user()->id }}"
         		user-name="{{ auth()->user()->getUserName() }}"
         		:types="{{json_encode(\App\Sos::getTypesArray())}}"

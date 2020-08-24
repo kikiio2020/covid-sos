@@ -44,6 +44,9 @@
                 <b-tab title="History" lazy ref="historyView">
                     <history-model-view></history-model-view>
                 </b-tab>
+                <template v-if="isHujo" v-slot:tabs-end>
+				      <b-nav-item href="/hujoCoin" role="presentation">Hujo</b-nav-item>
+			    </template>
             </b-tabs>
         </b-col>
     </b-row>
@@ -70,6 +73,7 @@ export default {
     components: {},
     props: [
         'isResponder',
+        'isHujo',
         'types',
         'userId',
         'userName',

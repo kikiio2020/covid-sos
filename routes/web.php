@@ -154,6 +154,12 @@ Route::get('webapi/person', function(){
         RequestOwnerOnly::class,
     ])
     ->name('hujopay');
+\Route::get('/hujoAcceptPledge/{sosRequest}', 'HomeController@hujoAcceptPledge')
+    ->middleware([
+        RequestStatusCanView::class . ':' . SosRequest::STATUS_PENDING,
+        RequestOwnerOnly::class,
+    ])
+    ->name('hujopromise');
 \Route::put('/webapi/hujoCoin/logEvent', 'Api\HujoCoinController@logEvent');
 \Route::put('/webapi/hujoCoin/withdraw', 'Api\HujoCoinController@withdraw');
 \Route::put('/webapi/hujoCoin/reinstate', 'Api\HujoCoinController@reinstate');

@@ -163,7 +163,8 @@ export default {
         	const confirmMsg = isResponder ? 
         			'Please confirm request from ' + row.requester + ' is completed.' :
        				'Please confirm your request "' + row.sos_text + '" is completed.'
-       				+ (row.is_hujo ? ' (You will be redirected to the Hujo exchange page.)' : '');
+       				//+ (row.is_hujo ? ' (You will be redirected to the Hujo exchange page.)' : '');
+       				;
         	
         	this.$bvModal.msgBoxConfirm(confirmMsg)
             .then(value => {

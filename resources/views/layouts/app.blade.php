@@ -57,10 +57,11 @@
 <body>
     <div id="app" class="content">
     <b-navbar toggleable="lg" style='background-color:#9daab5' type="light">
-    	<b-navbar-brand href="/">
+    	<b-navbar-brand href="/" class="d-flex">
     		<div style="font-weight:bold; font-size:xx-large; margin: -10px 10px -10px 20px;">
     			cov<span class="text-white">i</span>d-<span class="text-white">S</span><span class="text-danger">O</span><span class="text-white">S</span>
 			</div>
+			<div class="align-self-baseline text-muted"><small><small>ver. MVP</small></small></div>
 		</b-navbar-brand>
 
 		<b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -69,8 +70,10 @@
     
     		<b-navbar-nav>
                 @auth
+                    <!-- 
                     <b-nav-item href="#">SOS</b-nav-item>
                     <b-nav-item href="#">Help Someone</b-nav-item>
+                     -->
                 @else
 					<b-nav-item href="{{ route('register') }}">{{ __('Register') }}</b-nav-item>
                 @endauth
@@ -79,6 +82,9 @@
                 	<b-nav-item href="#"><span class="text-black-50 mx-3">Learn More</span></b-nav-item>
             	</b-nav-item-dropdown>
                 <b-nav-item href="#">Get In Touch</b-nav-item>
+                @if (Auth::user() && Auth::user()->loadCount('hujoCoin')->hujo_coin_count <= 0)
+                <b-nav-item href="/hujoCoin">Join the Hujo Network</b-nav-item>
+                @endif
           	</b-navbar-nav>
     
     		@auth

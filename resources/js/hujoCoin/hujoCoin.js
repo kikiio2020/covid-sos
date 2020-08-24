@@ -29,6 +29,7 @@ Vue.component('hujo-enrol', require('../components/VendorKiki/HujoCoin/HujoEnrol
 Vue.component('hujo-topup', require('../components/VendorKiki/HujoCoin/HujoTopup.vue').default);
 Vue.component('hujo-balance', require('../components/VendorKiki/HujoCoin/HujoBalance.vue').default);
 Vue.component('hujo-topup-cost', require('../components/VendorKiki/HujoCoin/HujoTopupCost.vue').default);
+Vue.component('hujo-promise', require('../components/VendorKiki/HujoCoin/HujoPromise.vue').default);
 Vue.component('hujo-send', require('../components/VendorKiki/HujoCoin/HujoSend.vue').default);
 
 Vue.use(BootstrapVue);

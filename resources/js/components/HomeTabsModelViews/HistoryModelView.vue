@@ -84,6 +84,13 @@ export default {
                     name: "sos_text",
                     id: "sos_text"
                 },
+                {
+                    fieldType: "model-read-only-field",
+                    placeholder: "Scheduled",
+                    name: "needed_by",
+                    id: "needed_by",
+                    
+                },
                 {   
                     fieldType: "model-read-only-field",
                     placeholder: "Request Description",
@@ -104,30 +111,6 @@ export default {
                     id: "user_approved",
                     label: "Requestor Approved",
                     
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Vendor",
-                    name: "vendor_name",
-                    id: "vendor_name"
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Vendor Address",
-                    name: "vendor_address",
-                    id: "vendor_address"
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Payment",
-                    name: "payment_option",
-                    id: "payment_option"
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Special Instructions",
-                    name: "special_instructions",
-                    id: "special_instructions"
                 },
             ],
         }

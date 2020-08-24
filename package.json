@@ -13,7 +13,7 @@
         "test:headless": "testcafe firefox:headless,chrome:headless tests/e2e/*.test.js --app \"npm run dev\" --app-init-delay 10000 -S -s screenshots"
     },
     "devDependencies": {
-        "@vue/test-utils": "^1.0.3",
+        "@vue/test-utils": "^1.0.4",
         "axios": "^0.19",
         "babel": "^6.23.0",
         "bootstrap": "^4.5.2",
@@ -22,18 +22,18 @@
         "jquery": "^3.5.1",
         "jsdom": "^16.4.0",
         "jsdom-global": "^3.0.2",
-        "laravel-mix": "^5.0.1",
-        "lodash": "^4.17.19",
+        "laravel-mix": "^5.0.5",
+        "lodash": "^4.17.20",
         "mocha": "^7.2.0",
         "mochapack": "^2.0.3",
         "popper.js": "^1.12",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.26.10",
         "sass-loader": "^8.0.0",
-        "testcafe": "^1.9.0",
-        "vue": "^2.6.11",
+        "testcafe": "^1.9.1",
+        "vue": "^2.6.12",
         "vue-loader": "^15.9.3",
-        "vue-template-compiler": "^2.6.11"
+        "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
         "@drizzle/vue-plugin": "^0.1.1",

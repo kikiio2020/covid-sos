@@ -74,11 +74,9 @@ class RequestAccepted extends Notification
                 . '**' . Carbon::parse($this->sosRequest->needed_by)->format('M d, Y') . '**'
                 . '. Great! You can start communicating by clicking the button below.';
             if ($isHujo) {
-                $line2 = 'As both you and ' 
-                    . $this->sosRequest->responder->name
-                    . ' are on the Hujo Coin network, you will be prompted to exchange one Hujo Coin with '
-                    . $this->sosRequest->responder->name 
-                    . ' at the completion of the request.';
+                $line2 = 'One Hujo Coin has been put on holding for ' 
+                    . '**' . $this->sosRequest->responder->name . '**'
+                    . ' and will be sent out once the request has been completed.';
             }
         }
         

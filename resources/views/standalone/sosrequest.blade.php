@@ -9,10 +9,21 @@
 				class="card-align-center"
 				title="{{ $sosRequest->sos->name }}"
 			>
-				<b-card-text>{{ $sosRequest->sos->description }}</b-card-text>
 				<div class="d-flex justify-content-left">
 					<div class="font-weight-bold">Needed By:</div>
 					<div class="ml-5">{{ $sosRequest->needed_by }}</div>
+				</div>
+				<div class="d-flex justify-content-left">
+					<div class="font-weight-bold">Description:</div>
+					<div class="ml-5">{{ $sosRequest->sos->description }}</div>
+				</div>
+				<div class="d-flex justify-content-left">
+					<div class="font-weight-bold">Signed off by Requester on:</div>
+					<div class="ml-5">{{ $sosRequest->user_approved }}</div>
+				</div>
+				<div class="d-flex justify-content-left">
+					<div class="font-weight-bold">Signed off by Responder on:</div>
+					<div class="ml-5">{{ $sosRequest->responder_approved }}</div>
 				</div>
 				
 				@if($sosRequest->sos->shoplistItem()->count())				
@@ -73,7 +84,7 @@
 				</b-card>
 				 -->
 				 
-				<div class="d-flex flex-column mt-5 mb-5 justify-content-center">
+				<div class="d-flex flex-column mt-5 mb-5 justify-content-center font-weight-bold">
 					Communication Log:
 					<chat-log chat="{{ $sosRequest->chat }}"></chat-log>
 				</div>

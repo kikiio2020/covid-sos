@@ -5,7 +5,7 @@
 	<b-card
 		header-tag="header"
 		style="max-width: 70rem;"
-		header="Hujo Coin Transfer"
+		:header="'Request \'' + requestName + '\' Completed'"
 	>
 		<b-card-text>
 			<b-card
@@ -15,12 +15,13 @@
 			>
 				<div class="d-flex justify-content-center">
 					<div>
-						You are about to send one Hujo Coin to 
+						Cool! Please give the go ahead for
 						<span class="font-weight-bold">{{ responderName }}</span>
-						in order to complete the request 
+						to recieve the Hujo Coin for completing the request
 						<span class="font-weight-bold">"{{ requestName }}"</span>
-						scheduled for
+						scheduled for 
 						<span class="font-weight-bold">{{ neededbyDate }}</span>
+						.
 					</div>
 				</div>
 			</b-card>
@@ -34,16 +35,18 @@
 					v-if="isDrizzleInitialized && hujoCoin.id && hujoCoin.crypto_address==activeAccount"
 					style="max-width: 60rem;"
 					border-variant="secondary"
-			        header="Your Hujo Coin account:"
+			        header="Request Completed"
 			        header-border-variant="secondary"
 				>
+					<!-- 
 					<b-card-text>
 						<div class="d-flex justify-content">
 							<span class="font-weight-bold pr-md-2">Current Hujo Coin Balance:</span> 
 							<hujo-balance></hujo-balance>
 						</div>
 					</b-card-text>
-					
+					 -->
+					 
 					<b-card-text v-if="txId">
 						<div class="d-flex justify-content">
 							<span class="font-weight-bold pr-md-2">Transaction ID:</span> 
@@ -55,19 +58,15 @@
 					</b-card-text>
 					
 					<b-card-text align=center>
-						<b-toast id="txSentSuccess" title="OK" variant="success" static no-auto-hide>
-					      	Transaction is sent. Your helper will receive the coin momentarily. Please copy the transaction ID above for future reference.
-					      	
-					      	<!-- 
-					      		TODO incorperate this message somehow:
-					      		"Thank you for confirming! We will notify your helper and will move this task to the History tab once everyone has approved. It will remain there for one month. Thank you!"
-					      	 -->
-					      	
+						<b-toast id="txSentSuccess" title="Transaction Success!" variant="success" static no-auto-hide>
+					      	Request is now completed. {{ responderName }} will receive the Hujo coin momentarily. Please keep the transaction ID above for future reference.
 					    </b-toast>
+					    <div class="my-2"><b-spinner v-if="apiSending"></b-spinner></div>
 						<hujo-send 
 							v-if="isDrizzleInitialized"
 							class="btn btn-success"
-							:to="hujoCoinRecipient.crypto_address" 
+							:to="hujoCoinRecipient.crypto_address"
+							caption="Reward Hujo Coin!" 
 							@sending="onTxSending"
 							@sent="onTxSent"
 							@errored="onTxErrored"
@@ -76,7 +75,7 @@
 							v-else
 							class="btn btn-success"
 							disabled=true
-						>Send</button>
+						>Reward Hujo Coin!</button>
 					</b-card-text>
 				</b-card>
 
@@ -143,29 +142,30 @@ export default {
     data() {
         return {
        		txId: '',
+       		apiSending: false,
         }
     },
     methods: { 
     	onTxSending(event) {
-        	axios.put('/webapi/hujoCoin/logEvent', {
+    		axios.put('/webapi/hujoCoin/logEvent', {
         		event: 'txSending',
         		...event	
         	});
         },
     	onTxSent(event) {
-        	console.log('txSent');
-        	console.log(event);
-        	
+        	this.apiSending = true;
         	this.txId = event.transactionHash;
         	axios.put('/webapi/sosRequest/completeRequest/' + this.requestId, {
         		'transaction_hash': event.transactionHash,
         	}).then(response => {
+        		this.apiSending = false;
         		this.$bvToast.show('txSentSuccess');
         		this.$root.$bvToast.toast('Success', {
                     title: 'Send Hujo Coin',
                     variant: 'success',
                 });	
         	}).catch(error => {
+        		this.apiSending = false;
         		this.$root.$bvToast.toast('Action failed.', {
                     title: 'Send Hujo Coin',
                     variant: 'danger',

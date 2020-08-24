@@ -68,6 +68,15 @@ class HomeController extends Controller
         return view('hujopay', ['sosRequest' => $sosRequest]);
     }
     
+    public function hujoAcceptPledge(SosRequest $sosRequest)
+    {
+        if ($sosRequest->user_approved) {
+            abort(Response::HTTP_FORBIDDEN, 'Oops! Looks like you have already completed this request.');
+        }
+        
+        return view('hujoacceptpledge', ['sosRequest' => $sosRequest]);
+    }
+    
     public function sosRequestStandAloneAccept(SosRequest $sosRequest)
     {
         return view('standalone.acceptpledge', [

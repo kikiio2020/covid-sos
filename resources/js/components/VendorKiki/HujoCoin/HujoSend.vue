@@ -1,5 +1,5 @@
 <template>
-<button @click="send" :disabled="disabled || balance<=0">{{caption}}</button>
+<button @click="send" :disabled="disabled || !hasPromise">{{cap}}</button>
 </template>
 <script>
 import { createNamespacedHelpers } from 'vuex';
@@ -9,10 +9,16 @@ const contractHelpers = createNamespacedHelpers('contracts');
 
 export default {
     components: {},
-    props: ['to'],
+    props: {
+    	to: String, 
+    	caption: {
+    		type: String,
+    		default: 'Release One Hujo Coin',
+    	},
+    },
     data() {
     	return {
-    		caption: 'Send One Hujo Coin',
+    		cap: this.caption,
     		disabled: false,
     	} 
     },
@@ -25,23 +31,16 @@ export default {
     			to: this.to, 
     			token: 1,
     		});
-    		this.caption = 'Sending...';
+    		this.cap = 'Sending...';
     		this.disabled = true;
     		this.hujoCoin.methods.transferFrom(
    				this.accountAddress, this.to, 1
  			).send().then((result, error) => {
- 				console.log('result:');
-   				console.log(result);
-   				console.log('error:');
-   				console.log(error);
-   				
-   				this.caption = 'Sent';
+   				this.cap = 'Sent';
    				this.$emit('sent', result);
    			}).catch((error) => {
-   				console.log('got error:');
-   				console.log(error);
    				this.disabled = false;
-   				this.caption = 'Send';
+   				this.cap = this.caption;
    				this.$emit('errored', error);
    			});
     	},
@@ -57,23 +56,23 @@ export default {
         accountAddress: function() {
         	return this.activeAccount;
         },
-        balance: function() {
+        hasPromise: function() {
         	return this.getContractData({
         		contract: 'HujoCoin',
-        		method: 'balanceOf',
+        		method: 'hasPromise',
         	});
         },
     },
     mounted() {
     	this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
     		contractName: 'HujoCoin',
-    		method: 'balanceOf',
-    		methodArgs: [this.accountAddress],
+    		method: 'hasPromise',
+    		methodArgs: [this.to, 1],
     	});
     	this.$drizzleEvents.$on('drizzle/contractEvent', ({eventName, data}) => {
  			// const { contractName, eventName, data } = payload
  		  	if ('Transfer' === eventName) {
- 			  	this.caption = 'Sent';
+ 			  	this.cap = 'Sent';
  			  	this.disabled = false;
  			  	this.$emit('sent', data);
  		  	}
