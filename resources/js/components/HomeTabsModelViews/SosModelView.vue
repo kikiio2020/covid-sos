@@ -105,7 +105,7 @@ export default {
                     class: "my-3 mr-3",
                     vBPopover: {
                         trigger: 'hover',
-                        content: 'Give your SOS a name for others to respond and yourself to remember next time.',
+                        content: 'Give a name to the help needed for others to see on the search result, and something you can remember to refer back.',
                         placement: 'top',
                         variant: 'primary'
                     },
@@ -122,14 +122,14 @@ export default {
                 },
                 {
                     fieldType: "b-form-textarea",
-                    caption: "Request Description",
+                    caption: "Description",
                     placeholder: "Request Description",
                     name: "description",
                     id: "description",
                     class: "my-3 mr-3",
                     vBPopover: {
                         trigger: 'hover',
-                        content: 'Give it a short desciption for more clarity',
+                        content: 'Give a short desciption of the help needed',
                         placement: 'top',
                         variant: 'primary'
                     },
@@ -141,6 +141,12 @@ export default {
                     name: "detail_instructions",
                     id: "detail_instructions",
                     class: "my-3 mr-3",
+                    vBPopover: {
+                        trigger: 'hover',
+                        content: 'Help your helpers to asist you better, or reminders to note. Be precise and clear.',
+                        placement: 'top',
+                        variant: 'primary'
+                    },
                 },
                 {
                     fieldType: "shoplist-items-field",

@@ -1,4 +1,5 @@
 <template>
+<div>
 <b-container>
     <b-row><b-col class="text-left">
         <crud-control
@@ -27,6 +28,10 @@
                 },
                 {
                 	key: 'type', 
+                    sortable: true,
+                },
+                {
+                    key: 'hujo', 
                     sortable: true,
                 },
                 {
@@ -62,6 +67,29 @@
         </crud-control>
     </b-col></b-row>
 </b-container>
+<b-modal
+	id="pledge-confirm-box"
+	title="Confirm Pledge"
+	header-bg-variant="primary"
+	header-text-variant="white"
+	size="sm"
+	button-size="sm"
+	ok-variant="primary"
+	cancel-variant="secondary"
+	cancel-title="NO"
+	footer-class="p-2"
+	:hideHeader-close="false"
+	:centered="true"
+	:busy="pledgeProcessing"
+	@ok="onPledgeRequestConfirmOK"
+>
+	{{ pledgeConfirmMsg }}
+	<template v-slot:modal-ok>
+		<b-spinner small v-if="pledgeProcessing"></b-spinner>
+		<span v-else>YES</span>
+	</template>
+</b-modal>
+</div>
 </template>
 
 <script>
@@ -71,6 +99,7 @@ export default {
     components: {CrudControl},
     props: [
         'isResponder',
+        'isHujo',
         'deliveryOptions', 
         'paymentOptions',
         'userId',
@@ -88,7 +117,13 @@ export default {
                     //selectMode: "single",
             },
             modalFields: [
-                {   
+            	{   
+                    fieldType: "model-read-only-field",
+                    placeholder: "Category",
+                    name: "type",
+                    id: "type"
+                },
+            	{   
                     fieldType: "model-read-only-field",
                     placeholder: "Request",
                     name: "name",
@@ -108,92 +143,76 @@ export default {
                 },
                 {
                     fieldType: "model-read-only-field",
-                    placeholder: "Delivery Option",
-                    id: "delivery_option_txt",
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Payment Option",
-                    id: "payment_option_txt",
-                },
-                {
-                    fieldType: "model-read-only-field",
-                    placeholder: "Special Instructions",
-                    name: "special_instructions",
-                    id: "special_instructions"
+                    placeholder: "Detail Instructions",
+                    name: "detail_instructions",
+                    id: "detail_instructions"
                 },
             ],
+            pledgeProcessing: false,
+            pledgeConfirmMsg: '',
+            toPledgeRequest: null,
         }
     },
     methods: {
-        pledgeRequest(request) {
+    	pledgeRequest(request) {
             const confirmMsg = 'Make a pledge to "' + request.name + '" for ' + request['creator.name'] + '?';
-            const hujoConfirmMsg = (request.hujo ? ' You will receive one Hujo Coin at completion.' : '');
-        	this.$bvModal.msgBoxConfirm(
-                confirmMsg + hujoConfirmMsg, 
-                {
-                    title: 'Confirm Pledge',
-                    headerBgVariant: 'primary',
-                    headerTextVariant: 'white',
-                    size: 'sm',
-                    buttonSize: 'sm',
-                    okVariant: 'primary',
-                    okTitle: 'YES',
-                    cancelVariant: 'secondary',
-                    cancelTitle: 'NO',
-                    footerClass: 'p-2',
-                    hideHeaderClose: false,
-                    centered: true
-                }
-            ).then(confirm => {
-                if (confirm) {
-                    axios.put(
-                        '/webapi/sosRequest/pledgeRequest/' + request.id
-                        /*, 
-                        {
-                            id: request.id,
-                            status: 1,
-                            responded_by: this.userId
-                        }*/
-                    ).then(response => {
-                        this.$root.$bvToast.toast('Pledge sent', {
-                            title: 'Thank you!',
-                            variant: 'success',
-                        });
-                        this.$bvModal.msgBoxOk(
-                            'Thanks for helping out! Your pledge has been sent. Please wait for a response.',
-                            {
-                                title: 'Pledge Sent',
-                                headerBgVariant: 'primary',
-                                headerTextVariant: 'white',
-                                size: 'sm',
-                                buttonSize: 'sm',
-                                footerClass: 'p-2',
-                                hideHeaderClose: false,
-                                centered: true
-                            }
-                        ).then((confirm) =>{
-                            this.$emit('nearbyNewPledged', {
-                                id: request.id,
-                            });
-                        }).catch(err => {
-                            // An error occurred
-                       	});
-                    }).catch(error => {
-                        var errMsg = 'Pledging failed';
-                    	if ('request_expired' == error.response.data.message) {
-                        	errMsg = 'The SOS Request is expired'; 
-                        }
-                        this.$root.$bvToast.toast(errMsg, {
-                            title: 'Pledging',
-                            variant: 'danger',
-                        });
-                    });       
-                }
-            }).catch(err => {
-                // An error occurred
-            })
+            const hujoConfirmMsg = (request.hujo == 'Y' && this.isHujo ? ' You will receive one Hujo Coin at completion.' : '');
+            this.pledgeConfirmMsg = confirmMsg + hujoConfirmMsg;
+            this.toPledgeRequest = request;
+            this.$bvModal.show('pledge-confirm-box');
+            
+            return;
         },
+		onPledgeRequestConfirmOK(event) {
+    		event.preventDefault();
+    		this.pledgeProcessing = true;
+    		axios.put(
+                    '/webapi/sosRequest/pledgeRequest/' + this.toPledgeRequest.id
+                    /*, 
+                    {
+                        id: request.id,
+                        status: 1,
+                        responded_by: this.userId
+                    }*/
+                ).then(response => {
+                	
+                	this.$root.$bvToast.toast('Pledge sent', {
+                        title: 'Thank you!',
+                        variant: 'success',
+                    });
+                    this.$bvModal.msgBoxOk(
+                        'Thanks for helping out! Your pledge has been sent. Please wait for a response.',
+                        {
+                            title: 'Pledge Sent',
+                            headerBgVariant: 'primary',
+                            headerTextVariant: 'white',
+                            size: 'sm',
+                            buttonSize: 'sm',
+                            footerClass: 'p-2',
+                            hideHeaderClose: false,
+                            centered: true
+                        }
+                    ).then((confirm) =>{
+                        this.$emit('nearbyNewPledged', {
+                            id: this.toPledgeRequest.id,
+                        });
+                    }).catch(err => {
+                        // An error occurred
+                   	});
+                }).catch(error => {
+                    var errMsg = 'Pledging failed';
+                	if ('request_expired' == error.response.data.message) {
+                    	errMsg = 'The SOS Request is expired'; 
+                    }
+                    this.$root.$bvToast.toast(errMsg, {
+                        title: 'Pledging',
+                        variant: 'danger',
+                    });
+                }).then(response => {
+                	this.$bvModal.hide('pledge-confirm-box');
+                	this.pledgeProcessing = false;
+                });   	
+    	},
         onSosRequestBackendFailed(error) {
     		this.$root.$bvToast.toast(error.response.data.message, {
                 title: 'Nearby SOS Requests',

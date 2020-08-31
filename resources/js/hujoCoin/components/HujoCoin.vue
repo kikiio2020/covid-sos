@@ -70,12 +70,6 @@
 								<span class="font-weight-bold pr-md-2">Hujo Coin Balance:</span> 
 								<hujo-balance></hujo-balance>
 							</div>
-							<div v-if="!hujoCoin.deleted_at" class="d-flex p-2">
-								<span class="font-weight-bold pr-md-2">
-									Hujo Coin Topup Amount:
-								</span> 
-								<hujo-topup-cost></hujo-topup-cost>
-							</div>
 							<div v-if="!hujoCoin.deleted_at"  class="d-flex p-2">
 								<span class="font-weight-bold pr-md-2">
 									Hujo Coin Topup Amount:

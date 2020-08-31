@@ -12,6 +12,7 @@
                 <b-tab title="Nearby Needs!" lazy ref="nearbyView">
                     <nearby-model-view
                         :is-responder="isResponder"
+                        :is-hujo="isHujo"
                         :user-id="userId"
                         ref="nearbyModelView"
                         @nearbyNewPledged="newPledged"

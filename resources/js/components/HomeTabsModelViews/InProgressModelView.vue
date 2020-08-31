@@ -141,8 +141,8 @@ export default {
                 {
                     fieldType: "model-read-only-field",
                     placeholder: "Detail Instructions",
-                    name: "detail_instructions",
-                    id: "detail_instructions"
+                    name: "sos_detail_instructions",
+                    id: "sos_detail_instructions"
                 },
             ],
             currentRequestForChat: {
@@ -181,8 +181,8 @@ export default {
             			.then((response) => {
             				this.$bvModal.msgBoxOk(
            						isResponder ? 
-           							'Thanks so much for helping out! We appreciate you being part of our community! Once everyone has signed off this request it will be moved to the History tab and will remain accessible for the next month.':
-          							'Thanks for confirming! Once everyone has signed off this request it will be moved to the History tab and will remain accessible for the next month.'
+           							'Thanks so much for helping out! We appreciate you being part of our community! Once everyone has signed off this request it will be moved to the History tab for the next month.':
+          							'Thanks! You request is now complete and will be moved to the History tab for the next month.'
          					);
             				this.$refs.myModelView.loadData();
             			}).catch((error) => {

@@ -36047,12 +36047,12 @@
         }
       },
       "links": {},
-      "address": "0x1f344C4C5E064Ac5373100E5B15150c43dF5D40B",
-      "transactionHash": "0x03116edf92979090c98935d5800eba4af4bc60465e4b60c6c39a08d521f62cbb"
+      "address": "0xbcD7B72a9e75C98005A4178782A56aba33bA7b76",
+      "transactionHash": "0x2482a8ab1a5b4fae975321433fc1d77c907e4a2210db9dc83541a99bfe018006"
     }
   },
   "schemaVersion": "3.1.0",
-  "updatedAt": "2020-08-22T21:57:04.701Z",
+  "updatedAt": "2020-08-25T19:55:40.232Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

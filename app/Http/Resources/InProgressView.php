@@ -20,6 +20,7 @@ class InProgressView extends JsonResource
         return array_merge($sosRequestObjectArray, [
             'sos_text' => $this->resource->sos->name,
             'sos_description' => $this->resource->sos->description,
+            'sos_detail_instructions' => $this->resource->sos->detail_instructions,
             'type' => __('model.sos.type.' . $this->resource->sos->type),
             'requester' => $this->resource->user->id == $userId ?
                 'Yourself' :

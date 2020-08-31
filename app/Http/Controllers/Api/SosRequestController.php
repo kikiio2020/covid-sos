@@ -282,7 +282,7 @@ class SosRequestController extends Controller
             abort(Response::HTTP_BAD_REQUEST, 'request_expired');
         }
         $isHujo = false;
-        if (auth()->user()->hujoCoin() && $sosRequest->user->hujoCoin()) {
+        if (auth()->user()->hujoCoin->exists && $sosRequest->user->hujoCoin->exists) {
             $isHujo = true;
         }
         DB::transaction(function() use ($sosRequestId, $isHujo) {

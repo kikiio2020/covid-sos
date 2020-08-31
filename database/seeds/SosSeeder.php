@@ -20,20 +20,6 @@ class SosSeeder extends Seeder
                 'detail_instructions' => NULL,
                 'created_by' => 1,
             ],
-            [
-                'name' => 'Drugstore run',
-                'type' => Sos::TYPE_CHORE,
-                'description' => 'get cold medicince',
-                'detail_instructions' => NULL,
-                'created_by' => 1,
-            ],
-            [
-                'name' => 'Weed run',
-                'type' => Sos::TYPE_CHORE,
-                'description' => 'Get from guy in corner',
-                'detail_instructions' => NULL,
-                'created_by' => 1,
-            ],
         ]);
     }
 }
